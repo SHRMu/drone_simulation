@@ -19,11 +19,21 @@ function main
     %       8 8
           ];% target [x(m),y(m)]
 
-    obstacle = [2 4;
-                3 3;
-                4 2;
-                ];
-    obstacleR=0.5;% parameter r
+%     obstacle = [2 4;
+%                 2 2;
+%                 4 4;
+%                 6 5;
+%                 ];
+    obstacle = [2 2;
+               2.5 2;
+               3 2;
+               3.5 2;
+               6 4;
+               6 4.5;
+               6 5;
+               6 5.5;
+               ];
+    obstacleR=0.1;% parameter r
 
     % velocity params
     Vm = 1.0; %Vmax [m/s]
@@ -31,7 +41,7 @@ function main
     Kinematic = [Vm,acc];
 
     % zone params
-    dangerR = 1.5;
+    dangerR = 0.5;
     omega = 2.0;
     zoneParam = [dangerR,omega*dangerR];
 
