@@ -19,12 +19,16 @@ function [] = DynamicWindowApproachSample()
     clear all;
 
     disp('Dynamic Window Approach sample program start!!')
-
-    x=[0 0 pi/2 0 0]';%init status[x(m),y(m),yaw(Rad),v(m/s),w(rad/s)]
+    
+    quad_init_x=0;%init pos
+    quad_init_y=0;
     goal=[10,10];% target [x(m),y(m)]
+    x=[quad_init_x quad_init_y atan2((goal(1,2)-quad_init_y(1,1)),(goal(1,1)-quad_init_x(1,1))) 0 0]';%init status[x(m),y(m),yaw(Rad),v(m/s),w(rad/s)]
+
     % obstacles pos [x(m) y(m)]
-    obstacle = [5 5;
-%              2,3
+    obstacle = [2 4;
+                3 3;
+%                 4 2;
                 ];
 %     obstacle=[0 2;
 %               4 2;

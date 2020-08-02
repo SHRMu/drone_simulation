@@ -1,4 +1,4 @@
-function velocity
+function velocityParam
 r=5; % drone r
 R=12; % danger zone R
 w=3; % sensor zone wR

@@ -88,13 +88,8 @@ function obs_new = RecogObstacles(x,goal,zoneParam,obs,r)
 end
 
 function [tmp] = ReconstructObs(x,obs)
-    [minVal,row] = matchest(obs,[x(1,1),x(2,1)]);
-    tmp = [obs(row,:)];
+    [minVal,row] = matchest(obs,x);
     obs = mean(obs);
-    tmp = [tmp;obs];
-end
-
-function [x,y] = shortestPoint(x, obs)
     
 end
 
