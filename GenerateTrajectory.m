@@ -1,4 +1,4 @@
-function [x,traj]=GenerateTrajectory(x,vt,wt,evaldt,model)
+function [x,traj]=GenerateTrajectory(x,model,vt,wt,evaldt)
     % ??????
     % evaldt???????; 
     global dt;

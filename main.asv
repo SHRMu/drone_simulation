@@ -30,7 +30,7 @@ Kinematic = [Vm];
 % zone params
 dangerR = 1.5;
 omega = 2.0;
-zoneParam = [dangerR,omega*dangerR];
+zoneParam = [dangerR, omega*dangerR];
 
 global dt; dt=0.1;% time[s]
 predictDT=3.0;
@@ -60,8 +60,8 @@ for i=1:5000
     plot(result.x(:,1),result.x(:,2),'-b');hold on;
     plot(goal(1,1),goal(1,2),'*b');hold on;
     plot(obstacles(:,1),obstacles(:,2),'d');hold on;
-    % plot danger and sensor zone
-    plotCircle(5,5,zoneParam);hold on;
+    % plot dna
+    plotCircle(5,5,1.5);hold on;
     % traj
     if ~isempty(traj)
         for it=1:length(traj(:,1))/5

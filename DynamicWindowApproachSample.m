@@ -23,34 +23,37 @@ function [] = DynamicWindowApproachSample()
     x=[0 0 pi/2 0 0]';%init status[x(m),y(m),yaw(Rad),v(m/s),w(rad/s)]
     goal=[10,10];% target [x(m),y(m)]
     % obstacles pos [x(m) y(m)]
-    % obstacle=[0 2;
-    %           4 2;
-    %           4 4;
-    %           5 4;
-    %           5 5;
-    %           5 6;
-    %           5 9
-    %           8 8
-    %           8 9
-    %           7 9];
-    obstacle=[0 2;
-              4 2;
-              4 4;
-              5 4;
-              5 5;
-              5 6;
-              5 9
-              8 8
-              8 9
-              7 9
-              6 5
-              6 3
-              6 8
-              6 7
-              7 4
-              9 8
-              9 11
-              9 6];
+    obstacle = [5 5;
+%              2,3
+                ];
+%     obstacle=[0 2;
+%               4 2;
+%               4 4;
+%               5 4;
+%               5 5;
+%               5 6;
+%               5 9
+%               8 8
+%               8 9
+%               7 9];
+%     obstacle=[0 2;
+%               4 2;
+%               4 4;
+%               5 4;
+%               5 5;
+%               5 6;
+%               5 9
+%               8 8
+%               8 9
+%               7 9
+%               6 5
+%               6 3
+%               6 8
+%               6 7
+%               7 4
+%               9 8
+%               9 11
+%               9 6];
 
     obstacleR=0.5;
     global dt; dt=0.1;% time[s]
@@ -147,7 +150,7 @@ function [evalDB,trajDB]=Evaluation(x,Vr,goal,ob,R,model,evalParam)
     for vt=Vr(1):model(5):Vr(2)
         for ot=Vr(3):model(6):Vr(4)
             % ????; ?? xt: ?????????????; traj: ???? ? ?????????
-            [xt,traj]=GenerateTrajectory(x,vt,ot,evalParam(4),model);  %evalParam(4),??????;
+            [xt,traj]=GenerateTrajectory(x,model,vt,ot,evalParam(4));  %evalParam(4),??????;
             % ????????
             heading=CalcHeadingEval(xt,goal);
             dist=CalcDistEval(xt,ob,R);
@@ -216,16 +219,3 @@ function heading=CalcHeadingEval(x,goal)
     heading=180-targetTheta;
 end
  
-
- 
-
- 
-function radian = toRadian(degree)
-    % degree to radian
-    radian = degree/180*pi;
-end
- 
-function degree = toDegree(radian)
-    % radian to degree
-    degree = radian/pi*180;
-end
