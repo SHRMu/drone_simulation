@@ -19,42 +19,51 @@ function main
     %       8 8
           ];% target [x(m),y(m)]
 
+    obstacle = [2 4;
+                3 3;
+                4 2;
+                ];
 %     obstacle = [2 4;
 %                 2 2;
 %                 4 4;
 %                 6 5;
 %                 ];
-    obstacle = [2 2;
-               2.5 2;
-               3 2;
-               3.5 2;
-               6 4;
-               6 4.5;
-               6 5;
-               6 5.5;
-               ];
-    obstacleR=0.1;% parameter r
+%     obstacle = [1 2;
+%                1.5 2;
+%                2 2;
+%                2.5 2;
+%                3 2;
+%                6 4;
+%                6 4.5;
+%                6 5;
+%                6 5.5;
+%                ];
+    obstacleR=0.1;% parameter r[m]
+                  % dimension of the drones
 
     % velocity params
     Vm = 1.0; %Vmax [m/s]
-    acc = 0.1; %acc [m/ss]
-    Kinematic = [Vm,acc];
+    Vacc = 0.1; %acc [m/ss]
+    Wm = toRadian(20.0);
+    Wacc = toRadian(50.0);
+    Kinematic = [Vm,Vacc,Wm,Wacc];
 
     % zone params
-    dangerR = 0.5;
-    omega = 2.0;
+    dangerR = 0.5; % paranmeter R
+    omega = 2.0;   % parameter omega
     zoneParam = [dangerR,omega*dangerR];
 
     global dt; dt=0.1;% time[s]
+    periodT = 0.1; % every T[s] communication
 
-    area=[-1 12 -1 12];% simulation [xmin xmax ymin ymax]
+    area=[-1 12 -1 12];% simulation area [xmin xmax ymin ymax]
 
     % init status[xi,yi,yaw,v,w]
     x=[quad_init_x(1,1) quad_init_y(1,1) atan2((goal(1,2)-quad_init_y(1,1)),(goal(1,1)-quad_init_x(1,1))) 0 0;]';
-    result.x=[];
+    result.x=[]; % save result value
     tic;
     for i=1:5000
-        [u,traj] = VelocityVectorApproach(x,Kinematic,goal,zoneParam,obstacle,obstacleR);
+        [u,traj] = VelocityVectorApproach(x,Kinematic,goal,zoneParam,obstacle,obstacleR,periodT);
         % update current status
         x=f(x,u);
         % save result

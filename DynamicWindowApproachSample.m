@@ -28,8 +28,23 @@ function [] = DynamicWindowApproachSample()
     % obstacles pos [x(m) y(m)]
     obstacle = [2 4;
                 3 3;
-%                 4 2;
+                4 2;
                 ];
+%     obstacle = [2 4;
+%                 2 2;
+%                 4 4;
+%                 6 5;
+%                 ];
+%     obstacle = [1 2;
+%                1.5 2;
+%                2 2;
+%                2.5 2;
+%                3 2;
+%                6 4;
+%                6 4.5;
+%                6 5;
+%                6 5.5;
+%                ];
 %     obstacle=[0 2;
 %               4 2;
 %               4 4;
@@ -40,24 +55,6 @@ function [] = DynamicWindowApproachSample()
 %               8 8
 %               8 9
 %               7 9];
-%     obstacle=[0 2;
-%               4 2;
-%               4 4;
-%               5 4;
-%               5 5;
-%               5 6;
-%               5 9
-%               8 8
-%               8 9
-%               7 9
-%               6 5
-%               6 3
-%               6 8
-%               6 7
-%               7 4
-%               9 8
-%               9 11
-%               9 6];
 
     obstacleR=0.5;
     global dt; dt=0.1;% time[s]
@@ -128,7 +125,7 @@ function [u,trajDB]=DynamicWindowApproach(x,model,goal,evalParam,ob,R)
     end
     evalDB=[evalDB feval];
 
-    [maxv,ind]=max(feval);% ??????
+    [maxv,ind]=max(feval);%
     u=evalDB(ind,1:2)';% 
 end
 
