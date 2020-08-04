@@ -19,12 +19,12 @@ function singleMain
     %       8 8
           ];% target [x(m),y(m)]
 
-    obstacle = [2 4;
-                3 3;
-                4 2;
-                ];
 %     obstacle = [2 4;
-%                 2 2;
+%                 3 3;
+%                 4 2;
+%                 ];
+%     obstacle = [2 4;
+%                 2 1;
 %                 4 4;
 %                 6 5;
 %                 ];

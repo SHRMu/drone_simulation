@@ -20,7 +20,7 @@ function multiMain
           ];% target [x(m),y(m)]
 
     obstacle = [2 4;
-                3 3;
+%                 3 3;
                 4 2;
                 ];
 %     obstacle = [2 4;
@@ -80,7 +80,7 @@ function multiMain
         result.quad1=[result.quad1; x(:,1)'];
         result.quad2=[result.quad2; x(:,2)'];
 
-        if norm(x(1:2)-goal')<0.5
+        if norm(x(1:2,1)-goal(1,:)') < obstacleR && norm(x(1:2,2)-goal(2,:)') < obstacleR
             disp('Arrive Goal!!');break;
         end
 
@@ -91,9 +91,9 @@ function multiMain
         quiver(x(1,1),x(2,1),ArrowLength*cos(x(3,1)),ArrowLength*sin(x(3,1)),'ok');hold on;
         quiver(x(1,2),x(2,2),ArrowLength*cos(x(3,2)),ArrowLength*sin(x(3,2)),'ok');hold on;
         plot(result.quad1(:,1),result.quad1(:,2),'-b');hold on;
-        plot(result.quad2(:,1),result.quad2(:,2),'-b');hold on;
+        plot(result.quad2(:,1),result.quad2(:,2),'-m');hold on;
         plot(goal(1,1),goal(1,2),'*b');hold on;
-        plot(goal(2,1),goal(2,2),'*b');hold on;
+        plot(goal(2,1),goal(2,2),'*m');hold on;
         
         plot(obstacle(:,1),obstacle(:,2),'d');hold on;
         % plot danger and sensor zone
@@ -111,7 +111,7 @@ function multiMain
         if ~isempty(traj2)
             for it=1:length(traj2(:,1))/5
                 ind=1+(it-1)*5;
-                plot(traj2(ind,:),traj2(ind+1,:),'-r');hold on;
+                plot(traj2(ind,:),traj2(ind+1,:),'-m');hold on;
             end
         end
         % DrawQuadrotor(x(1,1),x(2,1));

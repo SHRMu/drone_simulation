@@ -26,25 +26,28 @@ function [] = DynamicWindowApproachSample()
     x=[quad_init_x quad_init_y atan2((goal(1,2)-quad_init_y(1,1)),(goal(1,1)-quad_init_x(1,1))) 0 0]';%init status[x(m),y(m),yaw(Rad),v(m/s),w(rad/s)]
 
     % obstacles pos [x(m) y(m)]
-    obstacle = [2 4;
-                3 3;
-                4 2;
-                ];
 %     obstacle = [2 4;
-%                 2 2;
+%                 3 3;
+%                 4 2;
+%                 ];
+
+%     obstacle = [2 4;
+%                 2 1;
 %                 4 4;
 %                 6 5;
 %                 ];
-%     obstacle = [1 2;
-%                1.5 2;
-%                2 2;
-%                2.5 2;
-%                3 2;
-%                6 4;
-%                6 4.5;
-%                6 5;
-%                6 5.5;
-%                ];
+            
+    obstacle = [1 2;
+               1.5 2;
+               2 2;
+               2.5 2;
+               3 2;
+               6 4;
+               6 4.5;
+               6 5;
+               6 5.5;
+               ];
+           
 %     obstacle=[0 2;
 %               4 2;
 %               4 4;
@@ -64,6 +67,11 @@ function [] = DynamicWindowApproachSample()
     Kinematic=[1.0,toRadian(20.0),0.2,toRadian(50.0),0.01,toRadian(1)];
     % [heading,dist,velocity,predictDT]
     evalParam=[0.05,0.2,0.1,3.0];
+    % zone params
+    dangerR = 0.5; % paranmeter R
+    omega = 2.0;   % parameter omega
+    zoneParam = [dangerR,omega*dangerR];
+    
     area=[-1 11 -1 11];% sumulation area [xmin xmax ymin ymax]
 
     result.x=[];
@@ -89,7 +97,11 @@ function [] = DynamicWindowApproachSample()
         quiver(x(1),x(2),ArrowLength*cos(x(3)),ArrowLength*sin(x(3)),'ok');hold on;
         plot(result.x(:,1),result.x(:,2),'-b');hold on;
         plot(goal(1),goal(2),'*r');hold on;
-        plot(obstacle(:,1),obstacle(:,2),'*k');hold on;
+        plot(obstacle(:,1),obstacle(:,2),'d');hold on;
+        % plot danger and sensor zone
+        for io=1:length(obstacle(:,1))
+            plotCircle(obstacle(io,1),obstacle(io,2),zoneParam);hold on;
+        end
         % traj
         if ~isempty(traj)
             for it=1:length(traj(:,1))/5

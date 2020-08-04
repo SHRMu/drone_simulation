@@ -7,6 +7,6 @@ function plotCircle(a,b,zoneParam)
     % plot danger circle
     plot(danger_x,danger_y,'r-');
     % plot sensor circle
-    plot(sensor_x,sensor_y,'c:'); 
+    plot(sensor_x,sensor_y,'g:'); 
     axis equal;
 end
