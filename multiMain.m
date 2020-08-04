@@ -1,20 +1,20 @@
-function main
+function multiMain
     close all;
     clear all;
     clc;
     disp('Velocity Vector Program start!!');
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% init %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    num=1;%drone num
-    target_num=1;
+    num=2;%drone num
+    target_num=2;
     % quad_init_x=12*rand(num,1);%init pos
     % quad_init_y=12*rand(num,1);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% test %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    quad_init_x=0;%init pos
-    quad_init_y=0;
+    quad_init_x=[0;5];%init pos
+    quad_init_y=[0;5];
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     goal=[10 10; 
-    %       3 8;
+           0 0;
     %       8 3;
     %       8 8
           ];% target [x(m),y(m)]
@@ -59,15 +59,26 @@ function main
     area=[-1 12 -1 12];% simulation area [xmin xmax ymin ymax]
 
     % init status[xi,yi,yaw,v,w]
-    x=[quad_init_x(1,1) quad_init_y(1,1) atan2((goal(1,2)-quad_init_y(1,1)),(goal(1,1)-quad_init_x(1,1))) 0 0;]';
-    result.x=[]; % save result value
+    x=[quad_init_x(1,1) quad_init_y(1,1) atan2((goal(1,2)-quad_init_y(1,1)),(goal(1,1)-quad_init_x(1,1))) 0 0;
+       quad_init_x(2,1) quad_init_y(2,1) atan2((goal(2,2)-quad_init_y(2,1)),(goal(2,1)-quad_init_x(2,1))) 0 0;]';
+    result.quad1=[]; % save result value
+    result.quad2=[];
+    traj1 = [];
+    traj2 = [];
     tic;
     for i=1:5000
-        [u,traj] = VelocityVectorApproach(x,Kinematic,goal,zoneParam,obstacle,obstacleR,periodT);
-        % update current status
-        x=f(x,u);
+        
+        obstacle1 = [obstacle;x(1,2) x(2,2)];
+        obstacle2 = [obstacle;x(1,1) x(2,1)];
+        if norm(x(1:2,1)-goal(1,:)') > obstacleR
+            [x(:,1),traj1] = multiDroneApproach(x(:,1),Kinematic,goal(1,:),zoneParam,obstacle1,obstacleR,periodT);
+        end
+        if norm(x(1:2,2)-goal(2,:)') > obstacleR
+            [x(:,2),traj2] = multiDroneApproach(x(:,2),Kinematic,goal(2,:),zoneParam,obstacle2,obstacleR,periodT);
+        end
         % save result
-        result.x=[result.x; x'];
+        result.quad1=[result.quad1; x(:,1)'];
+        result.quad2=[result.quad2; x(:,2)'];
 
         if norm(x(1:2)-goal')<0.5
             disp('Arrive Goal!!');break;
@@ -78,8 +89,12 @@ function main
         ArrowLength=0.5;
         % drones 
         quiver(x(1,1),x(2,1),ArrowLength*cos(x(3,1)),ArrowLength*sin(x(3,1)),'ok');hold on;
-        plot(result.x(:,1),result.x(:,2),'-b');hold on;
+        quiver(x(1,2),x(2,2),ArrowLength*cos(x(3,2)),ArrowLength*sin(x(3,2)),'ok');hold on;
+        plot(result.quad1(:,1),result.quad1(:,2),'-b');hold on;
+        plot(result.quad2(:,1),result.quad2(:,2),'-b');hold on;
         plot(goal(1,1),goal(1,2),'*b');hold on;
+        plot(goal(2,1),goal(2,2),'*b');hold on;
+        
         plot(obstacle(:,1),obstacle(:,2),'d');hold on;
         % plot danger and sensor zone
         for io=1:length(obstacle(:,1))
@@ -87,10 +102,16 @@ function main
         end
         
         % traj
-        if ~isempty(traj)
-            for it=1:length(traj(:,1))/5
+        if ~isempty(traj1)
+            for it=1:length(traj1(:,1))/5
                 ind=1+(it-1)*5;
-                plot(traj(ind,:),traj(ind+1,:),'-g');hold on;
+                plot(traj1(ind,:),traj1(ind+1,:),'-g');hold on;
+            end
+        end
+        if ~isempty(traj2)
+            for it=1:length(traj2(:,1))/5
+                ind=1+(it-1)*5;
+                plot(traj2(ind,:),traj2(ind+1,:),'-r');hold on;
             end
         end
         % DrawQuadrotor(x(1,1),x(2,1));
