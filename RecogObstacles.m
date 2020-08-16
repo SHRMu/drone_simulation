@@ -17,17 +17,20 @@ function obs_new = RecogObstacles(x,zoneParam,obs)
     obs_new = [];
     while ~isempty(zoneObs) 
         groupObs = [];
-        ob = [zoneObs(1,:)];
+%         ob = [zoneObs(1,:)];
+        [minVal,row] = matchest(zoneObs,[x(1),x(2)]); 
+        ob = zoneObs(row,:);
         groupObs = [groupObs;ob]; 
-        zoneObs(1,:) = [];
+        zoneObs(row,:) = [];
         if isempty(zoneObs)
             obs_new=[obs_new;groupObs];
             break;
         else
             [minVal,row] = matchest(zoneObs,ob);
-            while ~isempty(zoneObs) && minVal <= zoneParam(1)
+            while ~isempty(zoneObs) && minVal <= 2*zoneParam(1)
                groupObs = [groupObs;zoneObs(row,:)];
                zoneObs(row,:) = [];
+               [minVal,row] = matchest(zoneObs,ob);
             end
             obs_new=[obs_new;ReconstructObs(x,groupObs)];
         end
@@ -35,6 +38,10 @@ function obs_new = RecogObstacles(x,zoneParam,obs)
 end
 
 function [obs] = ReconstructObs(x,obs)
+    [in,on] = inpolygon(x(1),x(2),obs(:,1),obs(:,2));
+    if in == 1 || on == 1
+        escape();
+    end
     [tx,ty] = shortestPoint(x, obs);
 %     obs = mean(obs);
     ob = [tx ty];

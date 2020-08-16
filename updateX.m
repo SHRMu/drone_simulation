@@ -1,4 +1,4 @@
-function x = f(x, u)
+function x = updateX(x, u)
     % Motion Model
     % u = [vt; wt]; current velocity, angular_velocity
     global dt;

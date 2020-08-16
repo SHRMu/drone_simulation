@@ -26,10 +26,11 @@ function [] = DynamicWindowApproachSample()
     x=[quad_init_x quad_init_y atan2((goal(1,2)-quad_init_y(1,1)),(goal(1,1)-quad_init_x(1,1))) 0 0]';%init status[x(m),y(m),yaw(Rad),v(m/s),w(rad/s)]
 
     % obstacles pos [x(m) y(m)]
-%     obstacle = [2 4;
-%                 3 3;
-%                 4 2;
-%                 ];
+    
+    obstacle = [2 4;
+                3 3;
+                4 2;
+                ];
 
 %     obstacle = [2 4;
 %                 2 1;
@@ -37,16 +38,16 @@ function [] = DynamicWindowApproachSample()
 %                 6 5;
 %                 ];
             
-    obstacle = [1 2;
-               1.5 2;
-               2 2;
-               2.5 2;
-               3 2;
-               6 4;
-               6 4.5;
-               6 5;
-               6 5.5;
-               ];
+%     obstacle = [1 2;
+%                1.5 2;
+%                2 2;
+%                2.5 2;
+%                3 2;
+%                6 4;
+%                6 4.5;
+%                6 5;
+%                6 5.5;
+%                ];
            
 %     obstacle=[0 2;
 %               4 2;

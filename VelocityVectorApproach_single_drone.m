@@ -1,4 +1,4 @@
-function singleMain
+function VelocityVectorApproach_single_drone
     close all;
     clear all;
     clc;
@@ -19,16 +19,16 @@ function singleMain
     %       8 8
           ];% target [x(m),y(m)]
 
-%     obstacle = [2 4;
-%                 3 3;
-%                 4 2;
-%                 ];
-%     obstacle = [2 4;
+    obstacles = [5 6;
+                 5.5 5.5;
+                 6 5;
+                ];
+%     obstacles = [2 4;
 %                 2 1;
 %                 4 4;
 %                 6 5;
 %                 ];
-%     obstacle = [1 2;
+%     obstacles = [1 2;
 %                1.5 2;
 %                2 2;
 %                2.5 2;
@@ -38,6 +38,19 @@ function singleMain
 %                6 5;
 %                6 5.5;
 %                ];
+%     obstacles = [2 4;
+%                  2.5 4.5;
+%                  3 5;
+%                  3.5 5.5;
+%                  4 6;
+%                  5 6;
+%                  6 6;
+%                  6 5;
+%                  6 4;
+% %                  5 3;
+% %                  4 2;
+%                  ];
+           
     obstacleR=0.1;% parameter r[m]
                   % dimension of the drones
 
@@ -63,9 +76,9 @@ function singleMain
     result.x=[]; % save result value
     tic;
     for i=1:5000
-        [u,traj] = VelocityVectorApproach(x,Kinematic,goal,zoneParam,obstacle,obstacleR,periodT);
+        [u,traj,obstacles] = VelocityVectorApproach(x,Kinematic,goal,zoneParam,obstacles,obstacleR,periodT);
         % update current status
-        x=f(x,u);
+        x=updateX(x,u);
         % save result
         result.x=[result.x; x'];
 
@@ -78,13 +91,12 @@ function singleMain
         ArrowLength=0.5;
         % drones 
         quiver(x(1,1),x(2,1),ArrowLength*cos(x(3,1)),ArrowLength*sin(x(3,1)),'ok');hold on;
+        plotCircle(x(1,1),x(2,1),zoneParam);hold on;
         plot(result.x(:,1),result.x(:,2),'-b');hold on;
         plot(goal(1,1),goal(1,2),'*b');hold on;
-        plot(obstacle(:,1),obstacle(:,2),'d');hold on;
-        % plot danger and sensor zone
-        for io=1:length(obstacle(:,1))
-            plotCircle(obstacle(io,1),obstacle(io,2),zoneParam);hold on;
-        end
+        
+%         plot(obstacles(:,1),obstacles(:,2),'d');hold on;
+        plotObstacles(obstacles,dangerR);hold on; 
         
         % traj
         if ~isempty(traj)

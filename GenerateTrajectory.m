@@ -7,7 +7,7 @@ function [x,traj]=GenerateTrajectory(x,model,vt,wt,evaldt)
     traj=x;% 
     while time<=evaldt
         time=time+dt;% 
-        x=f(x,u);% 
+        x=updateX(x,u);% 
         traj=[traj x];
     end
 end

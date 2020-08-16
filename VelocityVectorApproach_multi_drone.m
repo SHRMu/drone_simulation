@@ -1,4 +1,4 @@
-function multiMain
+function VelocityVectorApproach_multi_drone
     close all;
     clear all;
     clc;
@@ -20,9 +20,12 @@ function multiMain
           ];% target [x(m),y(m)]
 
     obstacle = [2 4;
-%                 3 3;
+                3 3;
                 4 2;
                 ];
+%     obstacle = [3 2;
+%                 2 3;
+%                 ];
 %     obstacle = [2 4;
 %                 2 2;
 %                 4 4;

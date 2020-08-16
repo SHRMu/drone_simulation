@@ -23,4 +23,6 @@ function [tx,ty] = shortestPoint(x, obs)
     [t] = lsqlin(C,d,A,b,A,b,lb,ub);
     tx = t(1);
     ty = t(2);
+    tx = roundn(tx,-2);
+    ty = roundn(ty,-2);
 end

@@ -69,9 +69,9 @@ function [vt,wt] = CalcVelocity(x,model,goal,zoneParam,obs,r,T)
     
     if theta ~= x(3)
         wt = (theta-x(3))/T;
-        if abs(wt-Owt)/T > model(4)
-            wt = Owt + (wt-Owt)/abs(wt-Owt)*model(4);
-    	end 
+%         if abs(wt-Owt)/T > model(4)
+%             wt = Owt + (wt-Owt)/abs(wt-Owt)*model(4);
+%     	end 
     else
         wt = 0;
     end 
