@@ -19,10 +19,10 @@ function VelocityVectorApproach_single_drone
     %       8 8
           ];% target [x(m),y(m)]
 
-    obstacles = [5 6;
-                 5.5 5.5;
-                 6 5;
-                ];
+%     obstacles = [5 6;
+%                  5.5 5.5;
+%                  6 5;
+%                 ];
 %     obstacles = [2 4;
 %                 2 1;
 %                 4 4;
@@ -38,18 +38,14 @@ function VelocityVectorApproach_single_drone
 %                6 5;
 %                6 5.5;
 %                ];
-%     obstacles = [2 4;
-%                  2.5 4.5;
-%                  3 5;
-%                  3.5 5.5;
-%                  4 6;
-%                  5 6;
-%                  6 6;
-%                  6 5;
-%                  6 4;
-% %                  5 3;
-% %                  4 2;
-%                  ];
+    obstacles = [4 6;
+                 5 6;
+                 5.5 5.5;
+                 6 5;
+                 6 4.5;
+                 6 4;
+                 ];
+    obs = obstacles;
            
     obstacleR=0.1;% parameter r[m]
                   % dimension of the drones
@@ -66,7 +62,7 @@ function VelocityVectorApproach_single_drone
     omega = 2.0;   % parameter omega
     zoneParam = [dangerR,omega*dangerR];
 
-    global dt; dt=0.1;% time[s]
+    global dt; dt=0.05;% time[s]
     periodT = 0.1; % every T[s] communication
 
     area=[-1 12 -1 12];% simulation area [xmin xmax ymin ymax]
@@ -76,7 +72,7 @@ function VelocityVectorApproach_single_drone
     result.x=[]; % save result value
     tic;
     for i=1:5000
-        [u,traj,obstacles] = VelocityVectorApproach(x,Kinematic,goal,zoneParam,obstacles,obstacleR,periodT);
+        [u,traj,obs,ob] = VelocityVectorApproach(x,Kinematic,goal,zoneParam,obs,obstacleR,periodT);
         % update current status
         x=updateX(x,u);
         % save result
@@ -88,15 +84,18 @@ function VelocityVectorApproach_single_drone
 
         %====Animation====
         hold off;
-        ArrowLength=0.5;
+        ArrowLength=0.2;
         % drones 
         quiver(x(1,1),x(2,1),ArrowLength*cos(x(3,1)),ArrowLength*sin(x(3,1)),'ok');hold on;
         plotCircle(x(1,1),x(2,1),zoneParam);hold on;
         plot(result.x(:,1),result.x(:,2),'-b');hold on;
         plot(goal(1,1),goal(1,2),'*b');hold on;
         
-%         plot(obstacles(:,1),obstacles(:,2),'d');hold on;
+
         plotObstacles(obstacles,dangerR);hold on; 
+        if ~isempty(ob)
+            plot(ob(:,1),ob(:,2),'d');hold on;
+        end
         
         % traj
         if ~isempty(traj)

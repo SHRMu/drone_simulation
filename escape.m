@@ -1,2 +1,0 @@
-function escape()
-end

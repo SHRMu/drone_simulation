@@ -10,6 +10,8 @@ function [vt,wt] = CalcVelocity(x,model,goal,zoneParam,obs,r,T)
     else
         for io=1:length(obs(:,1))
             di=norm(obs(io,:)-x(1:2)');
+            delta = AngleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1)))) - AngleConversion(toDegree(x(3)));
+            delta = abs(delta);
             if di < r
                 alpha = 0;
                 beta = 1;
@@ -19,13 +21,15 @@ function [vt,wt] = CalcVelocity(x,model,goal,zoneParam,obs,r,T)
                 beta = 0.5*(1+cos(pi*(di-r)/(zoneParam(1)-r)));
                 gamma = 0.5*(1-cos(pi*(di-r)/(zoneParam(1)-r)));
             elseif di > zoneParam(1) && di <= zoneParam(2)
-                alpha = 0.5*(1-cos(pi*(di-zoneParam(1))/(zoneParam(2)-zoneParam(1))));
-                beta = 0;
-                gamma = 0.5*(1+cos(pi*(di-zoneParam(1))/(zoneParam(2)-zoneParam(1))));
-%             elseif di > zoneParam(2)
-%                 alpha = 1;
-%                 beta = 0;
-%                 gamma = 0;
+                if delta < 90
+                    alpha = 0.5*(1-cos(pi*(di-zoneParam(1))/(zoneParam(2)-zoneParam(1))));
+                    beta = 0;
+                    gamma = 0.5*(1+cos(pi*(di-zoneParam(1))/(zoneParam(2)-zoneParam(1))));
+                else 
+                    alpha = 0;
+                    beta = 0;
+                    gamma = 1;
+                end 
             end
         
             V_t = alpha*model(1);
@@ -33,7 +37,8 @@ function [vt,wt] = CalcVelocity(x,model,goal,zoneParam,obs,r,T)
             V_o = beta*model(1);
             theta_o = AngleConversion(toDegree(atan2(obs(io,2)-x(2),obs(io,1)-x(1)))-180);
             V_g = gamma*model(1);
-            theta_g = AngleConversion(toDegree(atan2(obs(io,2)-x(2),obs(io,1)-x(1)))-90);
+            theta_g = theta_o - 90;
+%             theta_g = AngleConversion(toDegree(atan2(obs(io,2)-x(2),obs(io,1)-x(1)))-90);
             if abs(theta_t - theta_g) > 90
                 theta_g = AngleConversion(theta_g + 180);
             end
@@ -46,6 +51,8 @@ function [vt,wt] = CalcVelocity(x,model,goal,zoneParam,obs,r,T)
         if M > 1
             vt_mat = mean(vt_mat);
         end
+        
+        
     end
     % last T param
     Otheta = x(3);
