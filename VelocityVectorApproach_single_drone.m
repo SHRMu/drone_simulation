@@ -48,16 +48,18 @@ function VelocityVectorApproach_single_drone
                  6 4.5;
                  6 4;
                  ];
-%      obstacles = [6 7;
-%                   5.5 6.5;
+%     obstacles = [ 2 2;
+%                   4 6;
+%                   4.5 6;
 %                   5 6;
-%                   5.3 5.7;
-%                   5.5 5.5;
-%                   5.7 5.3;
+%                   5.5 6;
+%                   6 6;
+%                   6 5.5;
 %                   6 5;
-%                   6.5 5;
-%                   7 5;
-%                  ];
+%                   6 4.5;
+%                   6 4;
+%                   ];
+                  
     obs = obstacles;
            
     obstacleR=0.1;% parameter r[m]
