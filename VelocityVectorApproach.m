@@ -1,5 +1,4 @@
-function [u,traj,obs,ob] = VelocityVectorApproach(x,model,goal,zoneParam,obs,r,T)
-   
+function [u,traj,obs,ob] = VelocityVectorApproach(x,model,goal,zoneParam,obs,r,T) 
     obs_new = RecogObstacles(x,zoneParam,obs);
     obs_new = unique(obs_new,'rows','stable');
     ob = [];

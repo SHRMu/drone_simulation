@@ -1,12 +1,11 @@
-function TF = isCollinear(ob,obs)
-    TF = 0;
-    for oi = 1:length(obs)
-        for oj = oi+1:length(obs)
-            A = [obs(oi,:) 1; obs(oj,:) 1; ob(1,:) 1];
-            if rank(A)== 2
-                TF = 1;
-                break;
-            end
+function TF = isCollinear(obs)
+    TF = 1;
+    obs = sortrows(obs);
+    for oi = 1:length(obs)-2
+        A = [obs(oi,:) 1; obs(oi+1,:) 1; obs(oi+2,:) 1];
+        if rank(A)== 3
+            TF = 0;
+            break;
         end
     end
 end

@@ -6,18 +6,19 @@ function ob = escapeObs(x, obs)
     for oi = 1:length(obs)-1
         for oj = oi+1:length(obs)
             tmp = [obs(oi,:);obs(oj,:)];
-            if oj ~= length(obs) && isCollinear(obs(oj+1,:),tmp) == 1
-                break
+            if oj ~= length(obs) && checkCollinear(obs(oj+1,:),tmp) == 1
+                break;
             end
             slope = (obs(oj,2)-obs(oi,2))/(obs(oj,1)-obs(oi,1));
             if ~isKey(M,slope)
                 [tx,ty] = shortestPoint(x, [obs(oi,:); obs(oj,:)]);
                 ob = [tx,ty];
-                TF = isCollinear(ob,obs);
+                TF = checkCollinear(ob,obs);
                 if TF == 1
                     M(slope) = [tx,ty];
                 end
             end
+            break;
         end
     end
     slopes = cell2mat(keys(M));

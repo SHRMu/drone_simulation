@@ -39,12 +39,25 @@ function VelocityVectorApproach_single_drone
 %                6 5.5;
 %                ];
     obstacles = [4 6;
+                 4.5 6;
                  5 6;
+                 5.3 5.7;
                  5.5 5.5;
+                 5.7 5.3;
                  6 5;
                  6 4.5;
                  6 4;
                  ];
+%      obstacles = [6 7;
+%                   5.5 6.5;
+%                   5 6;
+%                   5.3 5.7;
+%                   5.5 5.5;
+%                   5.7 5.3;
+%                   6 5;
+%                   6.5 5;
+%                   7 5;
+%                  ];
     obs = obstacles;
            
     obstacleR=0.1;% parameter r[m]
@@ -58,7 +71,7 @@ function VelocityVectorApproach_single_drone
     Kinematic = [Vm,Vacc,Wm,Wacc];
 
     % zone params
-    dangerR = 0.5; % paranmeter R
+    dangerR = 0.8; % paranmeter R
     omega = 2.0;   % parameter omega
     zoneParam = [dangerR,omega*dangerR];
 
