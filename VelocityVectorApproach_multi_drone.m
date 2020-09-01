@@ -19,10 +19,10 @@ function VelocityVectorApproach_multi_drone
     %       8 8
           ];% target [x(m),y(m)]
 
-    obstacle = [2 4;
-                3 3;
-                4 2;
-                ];
+%     obstacle = [2 4;
+%                 3 3;
+%                 4 2;
+%                 ];
 %     obstacle = [3 2;
 %                 2 3;
 %                 ];
@@ -31,16 +31,16 @@ function VelocityVectorApproach_multi_drone
 %                 4 4;
 %                 6 5;
 %                 ];
-%     obstacle = [1 2;
-%                1.5 2;
-%                2 2;
-%                2.5 2;
-%                3 2;
-%                6 4;
-%                6 4.5;
-%                6 5;
-%                6 5.5;
-%                ];
+    obstacles = [1 2;
+               1.5 2;
+               2 2;
+               2.5 2;
+               3 2;
+               6 4;
+               6 4.5;
+               6 5;
+               6 5.5;
+               ];
     obstacleR=0.1;% parameter r[m]
                   % dimension of the drones
 
@@ -52,11 +52,11 @@ function VelocityVectorApproach_multi_drone
     Kinematic = [Vm,Vacc,Wm,Wacc];
 
     % zone params
-    dangerR = 0.5; % paranmeter R
+    dangerR = 0.8; % paranmeter R
     omega = 2.0;   % parameter omega
     zoneParam = [dangerR,omega*dangerR];
 
-    global dt; dt=0.1;% time[s]
+    global dt; dt=0.05;% time[s]
     periodT = 0.1; % every T[s] communication
 
     area=[-1 12 -1 12];% simulation area [xmin xmax ymin ymax]
@@ -71,8 +71,8 @@ function VelocityVectorApproach_multi_drone
     tic;
     for i=1:5000
         
-        obstacle1 = [obstacle;x(1,2) x(2,2)];
-        obstacle2 = [obstacle;x(1,1) x(2,1)];
+        obstacle1 = [obstacles;x(1,2) x(2,2)];
+        obstacle2 = [obstacles;x(1,1) x(2,1)];
         if norm(x(1:2,1)-goal(1,:)') > obstacleR
             [x(:,1),traj1] = multiDroneApproach(x(:,1),Kinematic,goal(1,:),zoneParam,obstacle1,obstacleR,periodT);
         end
@@ -93,16 +93,19 @@ function VelocityVectorApproach_multi_drone
         % drones 
         quiver(x(1,1),x(2,1),ArrowLength*cos(x(3,1)),ArrowLength*sin(x(3,1)),'ok');hold on;
         quiver(x(1,2),x(2,2),ArrowLength*cos(x(3,2)),ArrowLength*sin(x(3,2)),'ok');hold on;
+        plotCircle(x(1,1),x(2,1),zoneParam);hold on;
+        plotCircle(x(1,2),x(2,2),zoneParam);hold on;
         plot(result.quad1(:,1),result.quad1(:,2),'-b');hold on;
         plot(result.quad2(:,1),result.quad2(:,2),'-m');hold on;
         plot(goal(1,1),goal(1,2),'*b');hold on;
         plot(goal(2,1),goal(2,2),'*m');hold on;
         
-        plot(obstacle(:,1),obstacle(:,2),'d');hold on;
+        plotObstacles(obstacles,dangerR);hold on; 
+%         if ~isempty(ob)
+%             plot(ob(:,1),ob(:,2),'d');hold on;
+%         end
         % plot danger and sensor zone
-        for io=1:length(obstacle(:,1))
-            plotCircle(obstacle(io,1),obstacle(io,2),zoneParam);hold on;
-        end
+        
         
         % traj
         if ~isempty(traj1)

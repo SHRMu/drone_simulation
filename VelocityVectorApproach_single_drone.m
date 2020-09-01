@@ -7,13 +7,14 @@ function VelocityVectorApproach_single_drone
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% init %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     num=1;%drone num
     target_num=1;
-    % quad_init_x=12*rand(num,1);%init pos
-    % quad_init_y=12*rand(num,1);
+%     quad_init_x=12*rand(num,1);%init pos
+%     quad_init_y=12*rand(num,1);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% test %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     quad_init_x=0;%init pos
     quad_init_y=0;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    goal=[10 10; 
+    goal=[
+            10 10; 
     %       3 8;
     %       8 3;
     %       8 8
@@ -33,10 +34,26 @@ function VelocityVectorApproach_single_drone
 %                2 2;
 %                2.5 2;
 %                3 2;
+%                2 4;
+%                2 4.5;
+%                2 5;
+%                2 5.5;
+%                2 6;
+%                2.5 6;
+%                3 6;
 %                6 4;
 %                6 4.5;
 %                6 5;
 %                6 5.5;
+%                2 8;
+%                2.5 8;
+%                3 8;
+%                3.5 8;
+%                4 8;
+%                4 8.5;
+%                4 9;
+%                4 9.5;
+%                4 10;
 %                ];
     obstacles = [4 6;
                  4.5 6;
@@ -48,7 +65,8 @@ function VelocityVectorApproach_single_drone
                  6 4.5;
                  6 4;
                  ];
-%     obstacles = [ 2 2;
+%     obstacles = [ 
+%                   2 2;
 %                   4 6;
 %                   4.5 6;
 %                   5 6;
@@ -58,6 +76,8 @@ function VelocityVectorApproach_single_drone
 %                   6 5;
 %                   6 4.5;
 %                   6 4;
+%                   6 3.5;
+%                   6 3;
 %                   ];
                   
     obs = obstacles;

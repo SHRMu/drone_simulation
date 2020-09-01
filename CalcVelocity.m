@@ -1,15 +1,15 @@
-function [vt,wt] = CalcVelocity(x,model,goal,zoneParam,obs,r,T)
+function [vt,wt] = CalcVelocity(x,model,goal,zoneParam,obs_on,obs_off,r,T)
     vt_mat = [];
     % no obs within sensor zone
-    if isempty(obs)
+    if isempty(obs_on)
         V_t = model(1);
         theta_t = AngleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
         vtx = V_t*cos(toRadian(theta_t));
         vty = V_t*sin(toRadian(theta_t));
         vt_mat = [vt_mat;vtx vty];
     else
-        for io=1:length(obs(:,1))
-            di=norm(obs(io,:)-x(1:2)');
+        for io=1:length(obs_on(:,1))
+            di=norm(obs_on(io,:)-x(1:2)');
             delta = AngleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1)))) - AngleConversion(toDegree(x(3)));
             delta = abs(delta);
             if di < r
@@ -35,7 +35,7 @@ function [vt,wt] = CalcVelocity(x,model,goal,zoneParam,obs,r,T)
             V_t = alpha*model(1);
             theta_t = AngleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
             V_o = beta*model(1);
-            theta_o = AngleConversion(toDegree(atan2(obs(io,2)-x(2),obs(io,1)-x(1)))-180);
+            theta_o = AngleConversion(toDegree(atan2(obs_on(io,2)-x(2),obs_on(io,1)-x(1)))-180);
             V_g = gamma*model(1);
             theta_g = theta_o - 90;
 %             theta_g = AngleConversion(toDegree(atan2(obs(io,2)-x(2),obs(io,1)-x(1)))-90);
@@ -52,7 +52,14 @@ function [vt,wt] = CalcVelocity(x,model,goal,zoneParam,obs,r,T)
             vt_mat = mean(vt_mat);
         end
         
-        
+%         if ~isempty(obs_off)
+%             theta2o = toDegree(atan2(obs_off(1,2)-x(2),obs_off(1,1)-x(1)));
+%             if theta2o < 90
+%                 vt_tmp = [vt_mat(2),vt_mat(1)];
+%                 vt_mat = vt_tmp;
+%             end
+%         end
+
     end
     % last T param
     Otheta = x(3);

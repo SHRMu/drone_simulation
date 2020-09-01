@@ -1,7 +1,7 @@
 % obstacle recognition
 % obstacles within the sensor zone
 % obstalces can be recontructed
-function obs_new = RecogObstacles(x,zoneParam,obs)
+function [obs_on,obs_off] = RecogObstacles(x,zoneParam,obs)
     zoneObs = [];
 %     otherObs = [];
     % filter obstacles within sensor zone
@@ -10,20 +10,18 @@ function obs_new = RecogObstacles(x,zoneParam,obs)
         di=norm(obs(oi,:)-x(1:2)');
         if di <= zoneParam(2) % within sensor zone
             zoneObs = [zoneObs;obs(oi,1) obs(oi,2)];
-%         else
-%             otherObs = [otherObs;obs(oi,1) obs(oi,2)];
         end
     end
-    obs_new = [];
+    obs_on = [];
+    obs_off = [];
     while ~isempty(zoneObs) 
         groupObs = [];
-%         ob = [zoneObs(1,:)];
         [minVal,row] = matchest(zoneObs,[x(1),x(2)]); 
         ob = zoneObs(row,:);
         groupObs = [groupObs;ob]; 
         zoneObs(row,:) = [];
         if isempty(zoneObs)
-            obs_new=[obs_new;groupObs];
+            obs_on=[obs_on;groupObs];
             break;
         else
             [minVal,row] = matchest(zoneObs,ob);
@@ -34,27 +32,24 @@ function obs_new = RecogObstacles(x,zoneParam,obs)
             end
             [N,~] = size(groupObs);
             if N >= 2
-                obs_new=[obs_new;ReconstructObs(x,groupObs)];
+                [ob, obs_off] = ReconstructObs(x,groupObs);
+                obs_on=[obs_on; ob];
             else
-                obs_new = [obs_new;groupObs];
+                obs_on = [obs_on;groupObs];
             end
         end
     end
 end
 
-function [obs] = ReconstructObs(x,obs)
+function [obs,obs_off] = ReconstructObs(x,obs)
     TF = isCollinear(obs);
     if TF == 1
         [tx,ty] = shortestPoint(x, obs);
         ob = [tx ty];
+        obs_off = [];
     else
-        ob = escapeObs(x,obs);
+        [ob,obs_off] = escapeObs(x,obs);
     end
-    
-%     [in,on] = inpolygon(x(1),x(2),obs(:,1),obs(:,2));
-%     if in == 1 || on == 1
-%         [tx,ty] = escapeObs(x,obs);
-%     end
     
     [~,row]= matchest(obs,ob);
     obs = [obs(row,:);ob]; 
