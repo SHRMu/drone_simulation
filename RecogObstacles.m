@@ -1,7 +1,7 @@
 % obstacle recognition
 % obstacles within the sensor zone
 % obstalces can be recontructed
-function [obs_on,obs_off] = RecogObstacles(x,zoneParam,obs)
+function [obs_on,obs_off] = recogObstacles(x,zoneParam,obs)
     zoneObs = [];
 %     otherObs = [];
     % filter obstacles within sensor zone
@@ -16,7 +16,7 @@ function [obs_on,obs_off] = RecogObstacles(x,zoneParam,obs)
     obs_off = [];
     while ~isempty(zoneObs) 
         groupObs = [];
-        [minVal,row] = matchest(zoneObs,[x(1),x(2)]); 
+        [~,row] = matchest(zoneObs,[x(1),x(2)]); 
         ob = zoneObs(row,:);
         groupObs = [groupObs;ob]; 
         zoneObs(row,:) = [];
@@ -32,27 +32,31 @@ function [obs_on,obs_off] = RecogObstacles(x,zoneParam,obs)
             end
             [N,~] = size(groupObs);
             if N >= 2
-                [ob, obs_off] = ReconstructObs(x,groupObs);
+                [ob, obs_off] = reconstructObs(x,groupObs);
                 obs_on=[obs_on; ob];
             else
                 obs_on = [obs_on;groupObs];
             end
         end
     end
+    obs_on = unique(obs_on,'rows','stable');
+    obs_off = unique(obs_off,'rows','stable');
 end
 
-function [obs,obs_off] = ReconstructObs(x,obs)
+function [obs_on,obs_off] = reconstructObs(x,obs)
     TF = isCollinear(obs);
     if TF == 1
         [tx,ty] = shortestPoint(x, obs);
         ob = [tx ty];
         obs_off = [];
     else
+        % concave scenario
         [ob,obs_off] = escapeObs(x,obs);
     end
     
-    [~,row]= matchest(obs,ob);
-    obs = [obs(row,:);ob]; 
+%     [~,row]= matchest(obs,ob);
+%     obs_on = [obs(row,:);ob]; 
+    obs_on = ob;
 end
 
 function [minValue,row] = matchest(zoneObs,ob)
