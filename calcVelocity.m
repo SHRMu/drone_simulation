@@ -9,10 +9,15 @@ function [vt,wt] = calcVelocity(x,model,goal,zoneParam,obs_on,obs_off,r,T)
         vt_mat = [vt_mat;vtx vty];
     else
         for io=1:length(obs_on(:,1))
+%         for io=1:1
             di=norm(obs_on(io,:)-x(1:2)');
-            % angle between target point and yaw
-            delta = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1)))) - angleConversion(toDegree(x(3)));
-            delta = abs(delta);
+            
+            theta_t = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
+            theta_o = angleConversion(toDegree(atan2(obs_on(io,2)-x(2),obs_on(io,1)-x(1)))-180);
+            
+            yaw = angleConversion(toDegree(x(3)));
+            delta = abs(angleConversion(theta_t - yaw));
+
             if di < r
                 alpha = 0;
                 beta = 1;
@@ -34,17 +39,26 @@ function [vt,wt] = calcVelocity(x,model,goal,zoneParam,obs_on,obs_off,r,T)
             end
         
             V_t = alpha*model(1);
-            theta_t = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
             V_o = beta*model(1);
-            theta_o = theta_t - 180;
-%             theta_o = angleConversion(toDegree(atan2(obs_on(io,2)-x(2),obs_on(io,1)-x(1)))-180);
             V_g = gamma*model(1);
-            theta_g = theta_t - 90;
-%             theta_g = angleConversion(toDegree(atan2(obs(io,2)-x(2),obs(io,1)-x(1)))-90);
-%             if abs(theta_t - theta_g) > 90
-%                 theta_g = angleConversion(theta_g + 180);
+            if abs(angleConversion(theta_o - 90)-theta_t) < 90
+                theta_g = angleConversion(theta_o - 90);
+            else
+                theta_g = angleConversion(theta_o + 90);
+            end
+            
+       
+            if abs(angleConversion(theta_g - yaw)) > 90
+                theta_g = angleConversion(theta_g + 180);
+            end
+            
+%             if ~isempty(obs_off)
+%                 theta2off = angleConversion(toDegree(atan2(obs_off(1,2)-x(2),obs_off(1,1)-x(1))));
+%                 if abs(theta2off - theta_g) < 90
+%                     theta_g = angleConversion(theta_g - 180);
+%                 end
 %             end
-        
+
             vtx = V_t*cos(toRadian(theta_t))+V_o*cos(toRadian(theta_o))+V_g*cos(toRadian(theta_g));
             vty = V_t*sin(toRadian(theta_t))+V_o*sin(toRadian(theta_o))+V_g*sin(toRadian(theta_g));
             vt_mat = [vt_mat;vtx vty];
@@ -53,14 +67,6 @@ function [vt,wt] = calcVelocity(x,model,goal,zoneParam,obs_on,obs_off,r,T)
         if M > 1
             vt_mat = mean(vt_mat);
         end
-        
-%         if ~isempty(obs_off)
-%             theta2o = toDegree(atan2(obs_off(1,2)-x(2),obs_off(1,1)-x(1)));
-%             if theta2o < 90
-%                 vt_tmp = [vt_mat(2),vt_mat(1)];
-%                 vt_mat = vt_tmp;
-%             end
-%         end
 
     end
     % last T param

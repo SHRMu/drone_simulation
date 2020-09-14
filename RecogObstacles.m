@@ -1,7 +1,7 @@
 % obstacle recognition
 % obstacles within the sensor zone
 % obstalces can be recontructed
-function [obs_on,obs_off] = recogObstacles(x,zoneParam,obs)
+function [obs_on,obs_off] = recogObstacles(x,goal,zoneParam,obs)
     zoneObs = [];
 %     otherObs = [];
     % filter obstacles within sensor zone
@@ -40,6 +40,25 @@ function [obs_on,obs_off] = recogObstacles(x,zoneParam,obs)
         end
     end
     obs_on = unique(obs_on,'rows','stable');
+    [N,~] = size(obs_on);
+    if N >= 2
+        obs_mat = zeros(length(obs_on),2);
+        theta_t = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
+        for oi = 1:length(obs_on)
+            obs_mat(oi,1) = norm(obs(oi,:)-x(1:2)');
+            theta_o = angleConversion(toDegree(atan2(obs_on(oi,2)-x(2),obs_on(oi,1)-x(1)))-180);
+            obs_mat(oi,2) = abs(angleConversion(theta_o-theta_t));
+        end
+        if obs_mat(1,2) == obs_mat(2,2)
+            if obs_mat(1,1) <= obs_mat(2,1)
+                obs_off = [obs_off;obs_on(2,:)];
+                obs_on(2,:) = [];
+            else
+                obs_off = [obs_off;obs_on(1,:)];
+                obs_on(1,:) = [];
+            end
+        end
+    end
     obs_off = unique(obs_off,'rows','stable');
 end
 

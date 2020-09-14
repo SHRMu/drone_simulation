@@ -1,13 +1,17 @@
-function ret = sortMatrix(obs)
+function ret = sortMatrix(x, obs)
     obs = sortrows(obs);
     ret = [];
     for oi = 1:length(obs)
         if oi ~= 1 && obs(oi,1) == obs(oi-1,1)
-            break;
+            continue;
         else
             val = obs(oi,1);
             F = obs(find(obs(:,1)==val),:);
-            F = sortrows(F,-2);
+            if F(1,1) < x(1)
+                F = sortrows(F,2);
+            else
+                F = sortrows(F,-2);
+            end
             ret = [ret;F];
         end
     end

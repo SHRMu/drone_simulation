@@ -20,61 +20,33 @@ function VelocityVectorApproach_single_drone
     %       8 8
           ];% target [x(m),y(m)]
 
-%     obstacles = [5 6;
-%                  5.5 5.5;
-%                  6 5;
-%                 ];
-%     obstacles = [2 4;
-%                 2 1;
-%                 4 4;
-%                 6 5;
-%                 ];
-%     obstacles = [1 2;
+%     obstacles = [
+%                1 2;
 %                1.5 2;
 %                2 2;
 %                2.5 2;
 %                3 2;
-%                2 4;
-%                2 4.5;
-%                2 5;
-%                2 5.5;
-%                2 6;
-%                2.5 6;
-%                3 6;
 %                6 4;
 %                6 4.5;
 %                6 5;
 %                6 5.5;
-%                2 8;
-%                2.5 8;
-%                3 8;
-%                3.5 8;
-%                4 8;
-%                4 8.5;
-%                4 9;
-%                4 9.5;
-%                4 10;
+%                6 6;
+%                8 8;
 %                ];
-    obstacles = [4 6;
-                 4.5 6;
-                 5 6;
-                 5.3 5.7;
-                 5.5 5.5;
-                 5.7 5.3;
-                 6 5;
-                 6 4.5;
-                 6 4;
-                 8 4;
-                 8 4.5;
-                 8 5;
-                 8 5.5;
-                 8 6; 
-                 8 8;
-                 8.5 8;
-                 9 8;
-                 9.5 8;
-                 10 8;
-                 ];
+
+%     obstacles = [
+%                  4 6;
+%                  4.5 6;
+%                  5 6;
+%                  5.3 5.7;
+%                  5.5 5.5;
+%                  5.7 5.3;
+%                  6 5;
+%                  6 4.5;
+%                  6 4;
+%                  6 3.5;
+%                  ];
+
 %     obstacles = [ 
 %                   2 2;
 %                   4 6;
@@ -89,6 +61,35 @@ function VelocityVectorApproach_single_drone
 %                   6 3.5;
 %                   6 3;
 %                   ];
+              
+     obstacles = [
+                 2 4;
+                 2 4.5;
+                 2 5;
+                 2 5.5;
+                 2 6;
+                 2.5 6;
+                 3 6;
+                 3.5 6;
+                 4 6;
+                 4.5 6;
+                 5 6;
+                 5.3 5.7;
+                 5.5 5.5;
+                 5.7 5.3;
+                 6 5;
+                 6 4.5;
+                 6 4;
+                 6 3.5;
+                 6 3;
+                 6 2.5;
+                 6 2;
+                 5.5 2;
+                 5 2;
+                 4.5 2;
+                 4 2;
+%                  2 2;
+                 ];
 
 %     % random obstacles              
 %     random_obs_num = 10;
@@ -97,7 +98,6 @@ function VelocityVectorApproach_single_drone
 %         oby = 8*rand(num,1);
 %         obstacles = [obstacles;[obx oby]];
 %     end
-    obs = obstacles;
            
     obstacleR=0.1;% parameter r[m]
                   % dimension of the drones
@@ -106,7 +106,7 @@ function VelocityVectorApproach_single_drone
     Vm = 1.0; %Vmax [m/s]
     Vacc = 0.1; %acc [m/ss]
     Wm = toRadian(20.0);
-    Wacc = toRadian(50.0);
+    Wacc = toRadian(40.0);
     Kinematic = [Vm,Vacc,Wm,Wacc];
 
     % zone params
@@ -115,15 +115,22 @@ function VelocityVectorApproach_single_drone
     zoneParam = [dangerR,omega*dangerR];
 
     global dt; dt=0.05;% time[s]
-    periodT = 0.1; % every T[s] communication
+    periodT = 0.05; % every T[s] communication
 
     area=[-1 12 -1 12];% simulation area [xmin xmax ymin ymax]
 
     % init status[xi,yi,yaw,v,w]
     x=[quad_init_x(1,1) quad_init_y(1,1) atan2((goal(1,2)-quad_init_y(1,1)),(goal(1,1)-quad_init_x(1,1))) 0 0;]';
     result.x=[]; % save result value
+
     tic;
+    
+    writerObj=VideoWriter('simulation.avi');   
+    open(writerObj); 
+    obs = linkObstacles(obstacles,0.5);
+
     for i=1:5000
+        
         [u,traj,obs,ob] = VelocityVectorApproach(x,Kinematic,goal,zoneParam,obs,obstacleR,periodT);
         % update current status
         x=updateX(x,u);
@@ -144,7 +151,7 @@ function VelocityVectorApproach_single_drone
         plot(goal(1,1),goal(1,2),'*b');hold on;
         
 
-        plotObstacles(obstacles,dangerR);hold on; 
+       	plotObstacles(obs,dangerR);hold on; 
         if ~isempty(ob)
             plot(ob(:,1),ob(:,2),'d');hold on;
         end
@@ -160,8 +167,14 @@ function VelocityVectorApproach_single_drone
         axis(area);
         grid on;
         drawnow;
+        
+        frame = getframe;              
+        writeVideo(writerObj,frame); 
     end
+    close(writerObj); 
     toc;
+    
+     
 end
 
 

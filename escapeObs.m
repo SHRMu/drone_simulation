@@ -1,5 +1,6 @@
 function [ob_on,ob_off] = escapeObs(x, obs) 
-    obs = sortMatrix(obs);
+%     obs = sortMatrix(x, obs);
+    obs = linkObstacles(obs,0.5);
     M = containers.Map('KeyType','double', 'ValueType','any');
     oi = 1;
     while oi < length(obs)
