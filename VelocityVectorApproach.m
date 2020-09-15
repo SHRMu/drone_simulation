@@ -1,4 +1,5 @@
-function [u,traj,obs,ob] = VelocityVectorApproach(x,model,goal,zoneParam,obs,r,T) 
+function [u,traj,obs,ob] = VelocityVectorApproach(x,dis,model,goal,zoneParam,obs,drones,R,T) 
+    obs = [obs;drones];
     [obs_on,obs_off] = recogObstacles(x,goal,zoneParam,obs);
     ob = [];
     if ~isempty(obs_on)
@@ -6,7 +7,7 @@ function [u,traj,obs,ob] = VelocityVectorApproach(x,model,goal,zoneParam,obs,r,T
     end
 %     obs = [obs;obs_on];
     obs = unique(obs,'rows','stable');
-    [vt,ot] = calcVelocity(x,model,goal,zoneParam,obs_on,obs_off,r,T);
+    [vt,ot] = calcVelocity(x,dis,model,goal,zoneParam,obs_on,obs_off,drones,R,T);
     [x,traj]= GenerateTrajectory(x,model,vt,ot,T);
     u = [vt,ot]';
 end

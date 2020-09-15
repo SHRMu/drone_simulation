@@ -8,15 +8,15 @@ function VelocityVectorApproach_multi_drone
     num=5;%drone num
     scale = 12;
 
-%     quad_init_x=scale*rand(num,1);%init pos
-%     quad_init_y=scale*rand(num,1);
+    quad_init_x=scale*rand(num,1);%init pos
+    quad_init_y=scale*rand(num,1);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% test %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     quad_init_x=[0;4];%init pos
 %     quad_init_y=[0;0];
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     goal = 0.8*scale*rand(num,2);
+    goal = 0.8*scale*rand(num,2);
 
-    load("demo1.mat");
+    load("matlab.mat");
 
     obstacles = [
 %                1 2;
@@ -40,7 +40,7 @@ function VelocityVectorApproach_multi_drone
         obs = [];
     end
     
-    obstacleR=0.2;% parameter r[m]
+    obstacleR=0.1;% parameter r[m]
                   % dimension of the drones
 
     % velocity params
@@ -56,7 +56,7 @@ function VelocityVectorApproach_multi_drone
     zoneParam = [dangerR,omega*dangerR];
 
     global dt; dt=0.05;% time[s]
-    periodT = 0.1; % every T[s] communication
+    periodT = 0.05; % every T[s] communication
 
     area=[-1 scale -1 scale];% simulation area [xmin xmax ymin ymax]
 
@@ -78,8 +78,6 @@ function VelocityVectorApproach_multi_drone
     traj3 = [];
     traj4 = [];
     traj5 = [];
-    
-    flag = zeros(num,1);
 
     tic;
     
@@ -101,35 +99,30 @@ function VelocityVectorApproach_multi_drone
         dis4 = [x(6,1); x(6,2); x(6,3); x(6,5)];
         dis5 = [x(6,1); x(6,2); x(6,3); x(6,4)];
         
-        if norm(x(1:2,1)-goal(1,:)') > obstacleR 
+        if norm(x(1:2,1)-goal(1,:)') > obstacleR
             [x(:,1),traj1] = multiDroneApproach(x(:,1),dis1,Kinematic,goal(1,:),zoneParam,obs,obstacle1,obstacleR,periodT);
-        elseif flag(1,1) == 0
+        else
             obs = [obs;x(1,1) x(2,1)];
-            flag(1,1) = 1;
         end
         if norm(x(1:2,2)-goal(2,:)') > obstacleR
             [x(:,2),traj2] = multiDroneApproach(x(:,2),dis2,Kinematic,goal(2,:),zoneParam,obs,obstacle2,obstacleR,periodT);
-        elseif flag(2,1) == 0
+        else
             obs = [obs;x(1,2) x(2,2)];
-            flag(2,1) = 1;
         end
         if norm(x(1:2,3)-goal(3,:)') > obstacleR
             [x(:,3),traj3] = multiDroneApproach(x(:,3),dis3,Kinematic,goal(3,:),zoneParam,obs,obstacle3,obstacleR,periodT);
-        elseif flag(3,1) == 0
+        else
             obs = [obs;x(1,3) x(2,3)];
-            flag(3,1) = 1;
         end
         if norm(x(1:2,4)-goal(4,:)') > obstacleR
             [x(:,4),traj4] = multiDroneApproach(x(:,4),dis4,Kinematic,goal(4,:),zoneParam,obs,obstacle4,obstacleR,periodT);
-        elseif flag(4,1) == 0
+        else
             obs = [obs;x(1,4) x(2,4)];
-            flag(4,1) = 1;
         end
-        if norm(x(1:2,5)-goal(5,:)') > obstacleR
-            [x(:,5),traj5] = multiDroneApproach(x(:,5),dis5,Kinematic,goal(5,:),zoneParam,obs,obstacle5,obstacleR,periodT);
-        elseif flag(5,1) == 0
-            obs = [obs;x(1,5) x(2,5)];
-            flag(5,1) = 1;
+        if norm(x(1:2,5)-goal(1,:)') > obstacleR
+            [x(:,5),traj5] = multiDroneApproach(x(:,5),dis1,Kinematic,goal(5,:),zoneParam,obs,obstacle5,obstacleR,periodT);
+        else
+            obs = [obs;x(1,1) x(2,1)];
         end
         
         % save result
@@ -137,9 +130,8 @@ function VelocityVectorApproach_multi_drone
         result.quad2=[result.quad2; x(:,2)'];
         result.quad3=[result.quad3; x(:,3)'];
         result.quad4=[result.quad4; x(:,4)'];
-        result.quad5=[result.quad5; x(:,5)'];
 
-        if norm(x(1:2,1)-goal(1,:)') < obstacleR && norm(x(1:2,2)-goal(2,:)') < obstacleR && norm(x(1:2,3)-goal(3,:)') < obstacleR && norm(x(1:2,4)-goal(4,:)') < obstacleR  && norm(x(1:2,5)-goal(5,:)') < obstacleR
+        if norm(x(1:2,1)-goal(1,:)') < obstacleR && norm(x(1:2,2)-goal(2,:)') < obstacleR && norm(x(1:2,3)-goal(3,:)') < obstacleR && norm(x(1:2,4)-goal(4,:)') < obstacleR 
             disp('Arrive Goal!!');break;
         end
 
@@ -151,32 +143,29 @@ function VelocityVectorApproach_multi_drone
         quiver(x(1,2),x(2,2),ArrowLength*cos(x(3,2)),ArrowLength*sin(x(3,2)),'ok');hold on;
         quiver(x(1,3),x(2,3),ArrowLength*cos(x(3,3)),ArrowLength*sin(x(3,3)),'ok');hold on;
         quiver(x(1,4),x(2,4),ArrowLength*cos(x(3,4)),ArrowLength*sin(x(3,4)),'ok');hold on;
-        quiver(x(1,5),x(2,5),ArrowLength*cos(x(3,5)),ArrowLength*sin(x(3,5)),'ok');hold on;
         
         plotCircle(x(1,1),x(2,1),zoneParam);hold on;
         plotCircle(x(1,2),x(2,2),zoneParam);hold on;
         plotCircle(x(1,3),x(2,3),zoneParam);hold on;
         plotCircle(x(1,4),x(2,4),zoneParam);hold on;
-        plotCircle(x(1,5),x(2,5),zoneParam);hold on;
         
         plot(result.quad1(:,1),result.quad1(:,2),'-b');hold on;
         plot(result.quad2(:,1),result.quad2(:,2),'-m');hold on;
         plot(result.quad3(:,1),result.quad3(:,2),'-r');hold on;
         plot(result.quad4(:,1),result.quad4(:,2),'-g');hold on;
-        plot(result.quad5(:,1),result.quad5(:,2),'-k');hold on;
         
         plot(goal(1,1),goal(1,2),'*b');hold on;
         plot(goal(2,1),goal(2,2),'*m');hold on;
         plot(goal(3,1),goal(3,2),'*r');hold on;
         plot(goal(4,1),goal(4,2),'*g');hold on;
-        plot(goal(5,1),goal(5,2),'*k');hold on;
         
 %         plotObstacles(obstacles,dangerR);hold on; 
 %         if ~isempty(ob)
 %             plot(ob(:,1),ob(:,2),'d');hold on;
 %         end
         % plot danger and sensor zone
-
+        
+        
         % traj
         if ~isempty(traj1)
             for it=1:length(traj1(:,1))/5
@@ -200,12 +189,6 @@ function VelocityVectorApproach_multi_drone
             for it=1:length(traj4(:,1))/5
                 ind=1+(it-1)*5;
                 plot(traj4(ind,:),traj4(ind+1,:),'-g');hold on;
-            end
-        end
-        if ~isempty(traj5)
-            for it=1:length(traj5(:,1))/5
-                ind=1+(it-1)*5;
-                plot(traj5(ind,:),traj5(ind+1,:),'-k');hold on;
             end
         end
         % DrawQuadrotor(x(1,1),x(2,1));
