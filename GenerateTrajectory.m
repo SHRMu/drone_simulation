@@ -1,11 +1,11 @@
-function [x,traj]=GenerateTrajectory(x,model,vt,wt,evaldt)
+function [x,traj]=generateTrajectory(x,model,u,evaldt)
     global dt;
     time=0;
-    u=[vt;wt];% 
+%     u=[vtx;vty;wt];% 
     traj=x;% 
     while time<=evaldt
         time=time+dt;% 
-        x=updateX(x,u,time);% 
+        x=updateX(x,u);% 
         traj=[traj x];
     end
 end

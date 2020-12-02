@@ -16,6 +16,8 @@ function [ob_on,ob_off] = escapeObs(x, obs)
                 TF = checkCollinear(ob_on,obs);
                 if TF == 1
                     M(slope) = [tx,ty];
+                else
+                    M(slope) = [tx,ty];
                 end
             end
             oi = oj;

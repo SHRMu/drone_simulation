@@ -17,7 +17,7 @@ function [] = DynamicWindowApproachSample()
  
     close all;
     clear all;
-
+    clc;
     disp('Dynamic Window Approach sample program start!!')
     
     quad_init_x=0;%init pos
@@ -27,27 +27,26 @@ function [] = DynamicWindowApproachSample()
 
     % obstacles pos [x(m) y(m)]
     
-    obstacle = [2 4;
-                3 3;
-                4 2;
-                ];
-
-%     obstacle = [2 4;
-%                 2 1;
-%                 4 4;
-%                 6 5;
+%     obstacle = [
+%                 2 4;
+%                 3 3;
+%                 4 2;
 %                 ];
             
-%     obstacle = [1 2;
-%                1.5 2;
-%                2 2;
-%                2.5 2;
-%                3 2;
-%                6 4;
-%                6 4.5;
-%                6 5;
-%                6 5.5;
-%                ];
+    obstacle = [
+               1 2;
+               1.5 2;
+               2 2;
+               2.5 2;
+               3 2;
+               6 4;
+               6 4.5;
+               6 5;
+               6 5.5;
+               6 6;
+               6 6.5;
+               8 8;
+               ];
            
 %     obstacle=[0 2;
 %               4 2;
@@ -65,20 +64,22 @@ function [] = DynamicWindowApproachSample()
 
     % max_v[m/s],max_w[rad/s],acc_v[m/ss],acc_w[rad/ss],
     % resolution_v[m/s],Resolution_w[rad/s]]
-    Kinematic=[1.0,toRadian(20.0),0.2,toRadian(50.0),0.01,toRadian(1)];
+    Kinematic=[1.0,toRadian(20.0),0.1,toRadian(40.0),0.01,toRadian(1)];
     % [heading,dist,velocity,predictDT]
     evalParam=[0.05,0.2,0.1,3.0];
     % zone params
-    dangerR = 0.5; % paranmeter R
+    dangerR = 0.8; % paranmeter R
     omega = 2.0;   % parameter omega
     zoneParam = [dangerR,omega*dangerR];
     
-    area=[-1 11 -1 11];% sumulation area [xmin xmax ymin ymax]
+    area=[-1 12 -1 12];% sumulation area [xmin xmax ymin ymax]
 
     result.x=[];
+    
     tic;
     % movcount=0;
     % Main loop
+    
     for i=1:5000
         % DWA
         [u,traj]=DynamicWindowApproach(x,Kinematic,goal,evalParam,obstacle,obstacleR);
@@ -87,7 +88,7 @@ function [] = DynamicWindowApproachSample()
         result.x=[result.x; x'];
 
         % 
-        if norm(x(1:2)-goal')<0.5
+        if norm(x(1:2)-goal')< obstacleR
             disp('Arrive Goal!!');break;
         end
 
@@ -100,9 +101,9 @@ function [] = DynamicWindowApproachSample()
         plot(goal(1),goal(2),'*r');hold on;
         plot(obstacle(:,1),obstacle(:,2),'d');hold on;
         % plot danger and sensor zone
-        for io=1:length(obstacle(:,1))
-            plotCircle(obstacle(io,1),obstacle(io,2),zoneParam);hold on;
-        end
+%         for io=1:length(obstacle(:,1))
+%             plotCircle(obstacle(io,1),obstacle(io,2),zoneParam);hold on;
+%         end
         % traj
         if ~isempty(traj)
             for it=1:length(traj(:,1))/5
@@ -163,7 +164,7 @@ function [evalDB,trajDB]=Evaluation(x,Vr,goal,ob,R,model,evalParam)
     trajDB=[];
     for vt=Vr(1):model(5):Vr(2)
         for ot=Vr(3):model(6):Vr(4)
-            % ????; ?? xt: ?????????????; traj: ???? ? ?????????
+            % 
             [xt,traj]=GenerateTrajectory(x,model,vt,ot,evalParam(4));  %evalParam(4),??????;
             % ????????
             heading=CalcHeadingEval(xt,goal);
@@ -231,5 +232,38 @@ function heading=CalcHeadingEval(x,goal)
     end
 
     heading=180-targetTheta;
+end
+
+function x = f(x, u)
+    % Motion Model
+    % [xi,yi,yaw,v,w,dis]
+    % u = [vt; wt]; current velocity, angular_velocity
+    global dt;
+
+    F = [1 0 0 0 0 
+         0 1 0 0 0 
+         0 0 1 0 0 
+         0 0 0 0 0 
+         0 0 0 0 0];
+
+    B = [dt*cos(x(3)) 0
+        dt*sin(x(3)) 0
+        0 dt
+        1 0
+        0 1];
+
+    x= F*x+B*u;
+end
+
+function [x,traj]=GenerateTrajectory(x,model,vt,wt,evaldt)
+    global dt;
+    time=0;
+    u=[vt;wt];% 
+    traj=x;% 
+    while time<=evaldt
+        time=time+dt;% 
+        x=f(x,u);% 
+        traj=[traj x];
+    end
 end
  

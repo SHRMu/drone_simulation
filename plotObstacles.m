@@ -1,12 +1,12 @@
 function plotObstacles(obs,R)
-    if ~isempty(obs)
+    if ~isempty(obs)  
         for oi=1:length(obs(:,1))
             if oi == length(obs(:,1))
                 dis=norm(obs(oi-1,:)-obs(oi,:));
                 if dis <= R
                     line([obs(oi-1,1),obs(oi,1)],[obs(oi-1,2),obs(oi,2)],'LineWidth',2);hold on;
                 else
-                    plot(obs(oi,1),obs(oi,2),'*');hold on;
+                    plot(obs(oi,1),obs(oi,2),'d');hold on;
                 end   
             else
                 % group obstacles when dis between them less then 2*dangerR
@@ -20,7 +20,7 @@ function plotObstacles(obs,R)
                     elseif oi ~= 1 && checkCollinear(obs(oi-1,:),ob) == 1
                         line([obs(oi,1),obs(oj,1)],[obs(oi,2),obs(oj,2)],'LineWidth',2);hold on;
                     else
-                        plot(obs(oi,1),obs(oi,2),'*');hold on;
+                        plot(obs(oi,1),obs(oi,2),'d');hold on;
                     end
                     continue;
                 else
@@ -29,10 +29,10 @@ function plotObstacles(obs,R)
                         if checkCollinear(obs(oi,:),ob) == 1
                             line([obs(oi-1,1),obs(oi,1)],[obs(oi-1,2),obs(oi,2)],'LineWidth',2);hold on;
                         else
-                            plot(obs(oi,1),obs(oi,2),'*');hold on;
+                            plot(obs(oi,1),obs(oi,2),'d');hold on;
                         end
                     else
-                        plot(obs(oi,1),obs(oi,2),'*');hold on;
+                        plot(obs(oi,1),obs(oi,2),'d');hold on;
                         continue;
                     end
                 end  

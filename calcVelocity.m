@@ -1,66 +1,24 @@
-function [vt,wt] = calcVelocity(x,dis,model,goal,zoneParam,obs_on,obs_off,drones,R,T)
-    vt_mat = [];
+function [Vt] = calcVelocity(x,model,goal,zoneParams,obs_on,obs_off,drones,R,T)
+
     % no obs within sensor zone
-    if isempty(obs_on)
-        V_t = model(1);
-        theta_t = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
-        vtx = V_t*cos(toRadian(theta_t));
-        vty = V_t*sin(toRadian(theta_t));
-        vt_mat = [vt_mat;vtx vty];
-    % energy save
-%     elseif ismember(obs_on,drones,'rows')
-%         [M,~] = size(obs_on);
-%         obs_new = [];
-%         for i = 1:M
-%             item = find(drones == obs_on(i,:));          
-%             if x(6,1) < dis(item(1,1))
-%                 obs_new = [obs_new;obs_on(i,:)];
-%             end
-%         end
-%         vt_mat = calc(x,dis,model,goal,zoneParam,obs_new,obs_off,drones,R,T);
-    % save energy
+    if isempty(obs_on) && isempty(drones)
+%         Tvt = model(1);
+        th = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1)))); % theta2target
+        Tvtx = model(1)*cos(deg2rad(th));
+        Tvty = model(1)*sin(deg2rad(th));
+        Twt = (deg2rad(th)-x(3))/T;        
     else
-        vt_mat = calc(x,dis,model,goal,zoneParam,obs_on,obs_off,drones,R,T);
-    end
-    % last T param
-    Otheta = x(3);
-    Ovtx = cos(Otheta)*x(4);
-    Ovty = sin(Otheta)*x(4);
-    Owt = x(5); 
-    
-    % now T
-    vtx = vt_mat(1);
-    vty = vt_mat(2);
-    
-    if abs(vtx-Ovtx)/T > model(2)
-        vtx = Ovtx + (vtx-Ovtx)/abs(vtx-Ovtx)*model(2);
-    end
-    if abs(vty-Ovty)/T > model(2)
-        vty = Ovty + (vty-Ovty)/abs(vty-Ovty)*model(2);
+        [Tvtx,Tvty,Twt] = calc(x,model,goal,zoneParams,obs_on,obs_off,drones,R,T);
     end
     
-    theta = atan2(vty,vtx);
-    vt = vtx/cos(theta);
+    Vt = [Tvtx,Tvty,Twt]';
     
-    if theta ~= x(3)
-        wt = (theta-x(3))/T;
-        if abs(wt-Owt)/T > model(4)
-            wt = Owt + (wt-Owt)/abs(wt-Owt)*model(4);
-    	end 
-    else
-        wt = 0;
-    end 
 end
 
-function vt_mat = calc(x,dis,model,goal,zoneParam,obs_on,obs_off,drones,r,T)
+function [Tvtx,Tvty,Twt] = calc(x,model,goal,zoneParams,obs_on,obs_off,drones,r,T)
     vt_mat = [];
-    if isempty(obs_on)
-        V_t = model(1);
-        theta_t = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
-        vtx = V_t*cos(toRadian(theta_t));
-        vty = V_t*sin(toRadian(theta_t));
-        vt_mat = [vt_mat;vtx vty];
-    else
+    
+    if ~isempty(obs_on)
         for io=1:length(obs_on(:,1))
     %         for io=1:1
             di=norm(obs_on(io,:)-x(1:2)');
@@ -75,20 +33,21 @@ function vt_mat = calc(x,dis,model,goal,zoneParam,obs_on,obs_off,drones,r,T)
                 alpha = 0;
                 beta = 1;
                 gamma = 0;
-            elseif di > r && di <= zoneParam(1)
+            elseif di > r && di <= zoneParams(2)
                 alpha = 0;
-                beta = 0.5*(1+cos(pi*(di-r)/(zoneParam(1)-r)));
-                gamma = 0.5*(1-cos(pi*(di-r)/(zoneParam(1)-r)));
-            elseif di > zoneParam(1) && di <= zoneParam(2)
-                if delta < 90
-                    alpha = 0.5*(1-cos(pi*(di-zoneParam(1))/(zoneParam(2)-zoneParam(1))));
+                beta = 0.5*(1+cos(pi*(di-r)/(zoneParams(2)-r)));
+                gamma = 0.5*(1-cos(pi*(di-r)/(zoneParams(2)-r)));
+            elseif di > zoneParams(2) && di <= zoneParams(3)
+                %
+                if abs(angleConversion(theta_t - theta_o)) < 90
+                    alpha = 1;
                     beta = 0;
-                    gamma = 0.5*(1+cos(pi*(di-zoneParam(1))/(zoneParam(2)-zoneParam(1))));
-                else 
-                    alpha = 0;
+                    gamma = 0;
+                else
+                    alpha = 0.5*(1-cos(pi*(di-zoneParams(2))/(zoneParams(3)-zoneParams(2))));
                     beta = 0;
-                    gamma = 1;
-                end 
+                    gamma = 0.5*(1+cos(pi*(di-zoneParams(2))/(zoneParams(3)-zoneParams(2))));
+                end
             else
                 alpha = 1;
                 beta = 0;
@@ -99,25 +58,54 @@ function vt_mat = calc(x,dis,model,goal,zoneParam,obs_on,obs_off,drones,r,T)
             V_o = beta*model(1);
             V_g = gamma*model(1);
             
-            if abs(angleConversion(theta_o - 90)-theta_t) < 90
-                theta_g = angleConversion(theta_o - 90);
-            else
-                theta_g = angleConversion(theta_o + 90);
-            end
+%             if abs(angleConversion(theta_o - 90)-theta_t) < 90
+%                 theta_g = angleConversion(theta_o - 90);
+%             else
+%                 theta_g = angleConversion(theta_o + 90);
+%             end
+            theta_g = angleConversion(theta_o + 90);
 
-
-            if abs(angleConversion(theta_g - yaw)) > 90
-                theta_g = angleConversion(theta_g + 180);
-            end
+%             if abs(angleConversion(theta_g - yaw)) > 90
+%                 theta_g = angleConversion(theta_g + 180);
+%             end
 
             vtx = V_t*cos(toRadian(theta_t))+V_o*cos(toRadian(theta_o))+V_g*cos(toRadian(theta_g));
             vty = V_t*sin(toRadian(theta_t))+V_o*sin(toRadian(theta_o))+V_g*sin(toRadian(theta_g));
+            
             vt_mat = [vt_mat;vtx vty];
         end
-     end
+    else
+        V_t = model(1);
+        theta_t = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
+        vtx = V_t*cos(toRadian(theta_t));
+        vty = V_t*sin(toRadian(theta_t));
+        vt_mat = [vt_mat;vtx vty];   
+    end
+    
+%     if ~isempty(drones)
+%         [M,~] = size(drones);
+%         obs_on = [];
+%         for i = 1:M
+%             Vangle = angleConversion(toDegree(atan2(vty,vtx)));
+%             Dangle = angleConversion(toDegree(atan2(drones(i,2)-x(2),drones(i,1)-x(1))));
+%             theta = angleConversion(Vangle-Dangle);
+%             if abs(theta) < 90
+% %                 obs_on = [obs_on;drones(i,:)];
+%                 vt_mat = [0 0];
+%             end
+%         end
+%     end
+    
     [M,~] = size(vt_mat);
     if M > 1
         vt_mat = mean(vt_mat);
     end
     
+    Tvtx = vt_mat(1);
+    Tvty = vt_mat(2);
+%     Tvt = sqrt(vt_mat(1)^2 + vt_mat(2)^2);
+    th = atan2(vt_mat(2),vt_mat(1));
+    Twt = (th-x(3))/T;
 end
+
+

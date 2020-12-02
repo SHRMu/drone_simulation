@@ -1,14 +1,14 @@
 % obstacle recognition
 % obstacles within the sensor zone
 % obstalces can be recontructed
-function [obs_on,obs_off] = recogObstacles(x,goal,zoneParam,obs)
+function [obs_on,obs_off] = recogObstacles(x,goal,zoneParams,obs)
     zoneObs = [];
 %     otherObs = [];
     % filter obstacles within sensor zone
     for oi = 1:length(obs(:,1))
         % distance from obs_oi to x
         di=norm(obs(oi,:)-x(1:2)');
-        if di <= zoneParam(2) % within sensor zone
+        if di <= zoneParams(3) % within sensor zone
             zoneObs = [zoneObs;obs(oi,1) obs(oi,2)];
         end
     end
@@ -25,7 +25,7 @@ function [obs_on,obs_off] = recogObstacles(x,goal,zoneParam,obs)
             break;
         else
             [minVal,row] = matchest(zoneObs,ob);
-            while ~isempty(zoneObs) && minVal <= zoneParam(1)
+            while ~isempty(zoneObs) && minVal <= zoneParams(2)
                groupObs = [groupObs;zoneObs(row,:)];
                zoneObs(row,:) = [];
                [minVal,row] = groupMatchest(zoneObs,groupObs);
