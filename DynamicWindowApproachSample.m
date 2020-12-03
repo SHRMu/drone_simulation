@@ -64,11 +64,11 @@ function [] = DynamicWindowApproachSample()
 
     % max_v[m/s],max_w[rad/s],acc_v[m/ss],acc_w[rad/ss],
     % resolution_v[m/s],Resolution_w[rad/s]]
-    Kinematic=[1.0,toRadian(20.0),0.1,toRadian(40.0),0.01,toRadian(1)];
+    Kinematic=[1.0,toRadian(40.0),1.0,toRadian(80.0),0.01,toRadian(1)];
     % [heading,dist,velocity,predictDT]
     evalParam=[0.05,0.2,0.1,3.0];
     % zone params
-    dangerR = 0.8; % paranmeter R
+    dangerR = 1.0; % paranmeter R
     omega = 2.0;   % parameter omega
     zoneParam = [dangerR,omega*dangerR];
     

@@ -11,19 +11,18 @@ function newx = updateX(x, u)
          0 0 0 0 0 0
          0 0 0 0 0 0];
 
-%     B = [dt*cos(x(3)) -dt*sin(x(3))
-%         dt*sin(x(3)) dt*cos(x(3))
-%         0 dt
-%         1 0
-%         0 1];
-    B = [dt 0 0
-         0 dt 0
-         0 0 dt
-         1 0 0
-         0 1 0
-         0 0 1];
-
-    newx= F*x+B*u;
-    newx(3) = deg2rad(angleConversion(rad2deg(x(3))));
-
+    B = [dt*cos(x(3)) -dt*sin(x(3)) 0
+        dt*sin(x(3)) dt*cos(x(3)) 0
+        0 0 dt
+        1 0 0
+        0 1 0
+        0 0 1];
+%     B = [dt 0 0
+%          0 dt 0
+%          0 0 dt
+%          1 0 0
+%          0 1 0
+%          0 0 1];
+    delta = B*u;
+    newx= F*x+delta;
 end
