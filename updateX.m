@@ -17,12 +17,8 @@ function newx = updateX(x, u)
         1 0 0
         0 1 0
         0 0 1];
-%     B = [dt 0 0
-%          0 dt 0
-%          0 0 dt
-%          1 0 0
-%          0 1 0
-%          0 0 1];
+    
     delta = B*u;
     newx= F*x+delta;
+    newx(3) = deg2rad(angleConversion(rad2deg(newx(3))));
 end

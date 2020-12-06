@@ -2,16 +2,7 @@
 % obstacles within the sensor zone
 % obstalces can be recontructed
 function [obs_on,obs_off] = recogObstacles(x,goal,zoneParams,obs)
-    zoneObs = [];
-%     otherObs = [];
-    % filter obstacles within sensor zone
-    for oi = 1:length(obs(:,1))
-        % distance from obs_oi to x
-        di=norm(obs(oi,:)-x(1:2)');
-        if di <= zoneParams(3) % within sensor zone
-            zoneObs = [zoneObs;obs(oi,1) obs(oi,2)];
-        end
-    end
+    zoneObs = obsInSensorRegion(x,zoneParams,obs);
     obs_on = [];
     obs_off = [];
     while ~isempty(zoneObs) 
