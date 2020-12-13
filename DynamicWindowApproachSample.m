@@ -27,26 +27,26 @@ function [] = DynamicWindowApproachSample()
 
     % obstacles pos [x(m) y(m)]
     
-%     obstacle = [
-%                 2 4;
-%                 3 3;
-%                 4 2;
-%                 ];
-            
     obstacle = [
-               1 2;
-               1.5 2;
-               2 2;
-               2.5 2;
-               3 2;
-               6 4;
-               6 4.5;
-               6 5;
-               6 5.5;
-               6 6;
-               6 6.5;
-               8 8;
-               ];
+                2 4;
+                3 3;
+                4 2;
+                ];
+            
+%     obstacle = [
+%                1 2;
+%                1.5 2;
+%                2 2;
+%                2.5 2;
+%                3 2;
+%                6 4;
+%                6 4.5;
+%                6 5;
+%                6 5.5;
+%                6 6;
+%                6 6.5;
+%                8 8;
+%                ];
            
 %     obstacle=[0 2;
 %               4 2;
@@ -59,18 +59,18 @@ function [] = DynamicWindowApproachSample()
 %               8 9
 %               7 9];
 
-    obstacleR=0.5;
+    obstacleR=0.1;
     global dt; dt=0.5;% time[s]
 
     % max_v[m/s],max_w[rad/s],acc_v[m/ss],acc_w[rad/ss],
     % resolution_v[m/s],Resolution_w[rad/s]]
-    Kinematic=[1.0,toRadian(90.0),1.0,toRadian(90.0),0.01,toRadian(1)];
+    Kinematic=[1.0,toRadian(40.0),1.0,toRadian(20.0),0.01,toRadian(1)];
     % [heading,dist,velocity,predictDT]
     evalParam=[0.05,0.2,0.1,3.0];
-    % zone params
-    dangerR = 1.0; % paranmeter R
-    omega = 2.0;   % parameter omega
-    zoneParam = [dangerR,omega*dangerR];
+%     % zone params
+%     dangerR = 1.0; % paranmeter R
+%     omega = 2.0;   % parameter omega
+%     zoneParam = [dangerR,omega*dangerR];
     
     area=[-1 12 -1 12];% sumulation area [xmin xmax ymin ymax]
 
