@@ -1,10 +1,13 @@
-function [obs_dr] = droneConnection(x, goal, zoneParams, drones)
+function [obs_dr,dronesInSensor] = droneConnection(x, goal, zoneParams, drones)
     res = droneInSensorRegion(x,goal,zoneParams,drones);
+    dronesInSensor =[];
     [M,N] = size(res.pos);
     if M == 1
         obs_dr = res.pos;
+        dronesInSensor = res.pos;
     elseif ~isempty(res.pos)
        obs_dr = sum(res.pos.*res.weight);
+       dronesInSensor = res.pos;
     else
         obs_dr = [];
     end
@@ -12,6 +15,7 @@ function [obs_dr] = droneConnection(x, goal, zoneParams, drones)
 end
 
 function res = droneInSensorRegion(x,goal,zoneParams,drones)
+    % add it self
     [M,N] = size(drones);
     % only drones before and within the sensor region will be concluded 
     res.pos = [];

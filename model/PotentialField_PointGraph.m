@@ -24,8 +24,13 @@ function PotentialField_PointGraph
     hold on;
     plot(obs(1,1), obs(1,2),'d');
     plot(goal(1,1), goal(1,2),'*');
+    xlabel('X(m)');
+    ylabel('Y(m)');
     normA = total - min(total(:));
     Z = normA ./ max(normA(:)); % *
     figure;
     surfc(X,Y,Z);
+    xlabel('X(m)');
+    ylabel('Y(m)');
+    zlabel('Potential value');
 end

@@ -54,4 +54,7 @@ function PotentialField_LineGraph
     Z = normA ./ max(normA(:)); % 
     figure;
     surf(X,Y,Z);
+    xlabel('X(m)');
+    ylabel('Y(m)');
+    zlabel('Potential value');
 end

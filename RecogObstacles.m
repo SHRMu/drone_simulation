@@ -34,10 +34,10 @@ function [obs_on,obs_off] = recogObstacles(x,goal,zoneParams,obs)
     [N,~] = size(obs_on);
     if N >= 2
         obs_mat = zeros(length(obs_on),2);
-        theta_t = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
+        theta_t = angleConversion(rad2deg(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
         for oi = 1:length(obs_on)
             obs_mat(oi,1) = norm(obs(oi,:)-x(1:2)');
-            theta_o = angleConversion(toDegree(atan2(obs_on(oi,2)-x(2),obs_on(oi,1)-x(1)))-180);
+            theta_o = angleConversion(rad2deg(atan2(obs_on(oi,2)-x(2),obs_on(oi,1)-x(1)))-180);
             obs_mat(oi,2) = abs(angleConversion(theta_o-theta_t));
         end
         if obs_mat(1,2) == obs_mat(2,2)

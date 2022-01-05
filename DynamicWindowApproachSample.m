@@ -1,18 +1,3 @@
-% -------------------------------------------------------------------------
-%
-% File : DynamicWindowApproachSample.m
-%
-% Discription : Mobile Robot Motion Planning with Dynamic Window Approach
-%
-% Environment : Matlab
-%
-% Author : Atsushi Sakai
-%
-% Copyright (c): 2014 Atsushi Sakai
-%
-% License : Modified BSD Software License Agreement
-% -------------------------------------------------------------------------
- 
 function [] = DynamicWindowApproachSample()
  
     close all;
@@ -27,12 +12,14 @@ function [] = DynamicWindowApproachSample()
 
     % obstacles pos [x(m) y(m)]
     
-    obstacle = [
-                2 4;
-                3 3;
-                4 2;
-                ];
-            
+% %     obstacle = [
+% %                 2 4;
+% %                 2.5 3.5;
+% %                 3 3;
+% %                 3.5 2.5;
+% %                 4 2;
+% %                 ];
+% %             
 %     obstacle = [
 %                1 2;
 %                1.5 2;
@@ -47,6 +34,35 @@ function [] = DynamicWindowApproachSample()
 %                6 6.5;
 %                8 8;
 %                ];
+
+    obstacle = [
+                 4 6;
+                 4.5 6;
+                 5 6;
+                 5.3 5.7;
+                 5.5 5.5;
+                 5.7 5.3;
+                 6 5;
+                 6 4.5;
+                 6 4;
+                 6 3.5;
+                 ];
+
+%     obstacle = [ 
+%                   2 2;
+%                   4 6;
+%                   4.5 6;
+%                   5 6;
+%                   5.5 6;
+%                   6 6;
+%                   6 5.5;
+%                   6 5;
+%                   6 4.5;
+%                   6 4;
+%                   6 3.5;
+%                   6 3;
+%                   ];
+
            
 %     obstacle=[0 2;
 %               4 2;
@@ -59,14 +75,14 @@ function [] = DynamicWindowApproachSample()
 %               8 9
 %               7 9];
 
-    obstacleR=0.1;
+    obstacleR=0.5;
     global dt; dt=0.5;% time[s]
 
     % max_v[m/s],max_w[rad/s],acc_v[m/ss],acc_w[rad/ss],
     % resolution_v[m/s],Resolution_w[rad/s]]
-    Kinematic=[1.0,toRadian(40.0),1.0,toRadian(20.0),0.01,toRadian(1)];
+    Kinematic=[1.0,deg2rad(90.0),1.0,deg2rad(90.0),0.1,deg2rad(1)];
     % [heading,dist,velocity,predictDT]
-    evalParam=[0.05,0.2,0.1,3.0];
+    evalParam=[0.05,0.5,0.1,1.0];
 %     % zone params
 %     dangerR = 1.0; % paranmeter R
 %     omega = 2.0;   % parameter omega
@@ -76,8 +92,11 @@ function [] = DynamicWindowApproachSample()
 
     result.x=[];
     
+%     writerObj=VideoWriter('simulation.avi');   
+%     open(writerObj); 
+    obs = linkObstacles(obstacle,0.5); 
     tic;
-    % movcount=0;
+%     movcount=0;
     % Main loop
     
     for i=1:5000
@@ -99,7 +118,15 @@ function [] = DynamicWindowApproachSample()
         quiver(x(1),x(2),ArrowLength*cos(x(3)),ArrowLength*sin(x(3)),'ok');hold on;
         plot(result.x(:,1),result.x(:,2),'-b');hold on;
         plot(goal(1),goal(2),'*r');hold on;
-        plot(obstacle(:,1),obstacle(:,2),'d');hold on;
+%         plot(obstacle(:,1),obstacle(:,2),'d');hold on;
+        
+%         [M,~] = size(obs);
+%         if M >= 2
+            plotObstacles(obs,0.5);hold on; 
+%         else
+%             plot(obs(:,1),obs(:,2),'d');hold on;
+%         end
+       	
         % plot danger and sensor zone
 %         for io=1:length(obstacle(:,1))
 %             plotCircle(obstacle(io,1),obstacle(io,2),zoneParam);hold on;
@@ -113,12 +140,17 @@ function [] = DynamicWindowApproachSample()
         end
         axis(area);
         grid on;
+        xlabel("X(m)");
+        ylabel("Y(m)");
         drawnow;
-        %movcount=movcount+1;
-        %mov(movcount) = getframe(gcf);% 
+%         movcount=movcount+1;
+%         mov(movcount) = getframe(gcf);% 
+%         frame = getframe;              
+%         writeVideo(writerObj,frame); 
     end
+%     close(writerObj); 
     toc
-    %movie2avi(mov,'movie.avi');
+%     movie2avi(mov,'simulation.avi');
 end
  
 function [u,trajDB]=DynamicWindowApproach(x,model,goal,evalParam,ob,R)
@@ -166,11 +198,9 @@ function [evalDB,trajDB]=Evaluation(x,Vr,goal,ob,R,model,evalParam)
         for ot=Vr(3):model(6):Vr(4)
             % 
             [xt,traj]=GenerateTrajectory(x,model,vt,ot,evalParam(4));  %evalParam(4),??????;
-            % ????????
             heading=CalcHeadingEval(xt,goal);
             dist=CalcDistEval(xt,ob,R);
             vel=abs(vt);
-            % ???????
             stopDist=CalcBreakingDist(vel,model);
             if dist>stopDist % 
                 evalDB=[evalDB;[vt ot heading dist vel]];
@@ -181,7 +211,6 @@ function [evalDB,trajDB]=Evaluation(x,Vr,goal,ob,R,model,evalParam)
 end
 
 function EvalDB=NormalizeEval(EvalDB)
-    % ???????
     if sum(EvalDB(:,3))~=0
         EvalDB(:,3)=EvalDB(:,3)/sum(EvalDB(:,3));
     end
@@ -195,7 +224,6 @@ end
 
 
 function stopDist=CalcBreakingDist(vel,model)
-    % ?????????????,???????????????????????
     global dt;
     stopDist=0;
     while vel>0
@@ -207,13 +235,12 @@ function dist=CalcDistEval(x,ob,R)
     % ?????????
     dist=100;
     for io=1:length(ob(:,1))
-        disttmp=norm(ob(io,:)-x(1:2)')-R;%???????????????????
-        if dist>disttmp% ?????????
+        disttmp=norm(ob(io,:)-x(1:2)')-R;
+        if dist>disttmp
             dist=disttmp;
         end
     end
 
-    % ??????????????????????????????????????
     if dist>=2*R
         dist=2*R;
     end
@@ -222,8 +249,8 @@ end
 function heading=CalcHeadingEval(x,goal)
     % heading???????
 
-    theta=toDegree(x(3));% ?????
-    goalTheta=toDegree(atan2(goal(2)-x(2),goal(1)-x(1)));% ??????
+    theta=rad2deg(x(3));% ?????
+    goalTheta=rad2deg(atan2(goal(2)-x(2),goal(1)-x(1)));% ??????
 
     if goalTheta>theta
         targetTheta=goalTheta-theta;% [deg]

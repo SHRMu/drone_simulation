@@ -1,9 +1,8 @@
 function [Vt] = CalcFieldVelocity(x,model,goal,zoneParams,obs_on,obs_dr,dR)
-    global dt;
     % no obs within sensor zone
     if isempty(obs_on) && isempty(obs_dr)
-        theta_t = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1)))); % theta2target
-        yaw = angleConversion(toDegree(x(3)));
+        theta_t = angleConversion(rad2deg(atan2(goal(1,2)-x(2),goal(1,1)-x(1)))); % theta2target
+        yaw = angleConversion(rad2deg(x(3)));
         delta_t = angleConversion(theta_t - yaw);
         Tvtx = model(1)*cos(deg2rad(delta_t));
         Tvty = model(1)*sin(deg2rad(delta_t));
@@ -13,7 +12,7 @@ function [Vt] = CalcFieldVelocity(x,model,goal,zoneParams,obs_on,obs_dr,dR)
     Twt = CalcAngular(x,Tvtx,Tvty);
     Twt = angularConversion(Twt);
     Vt = [Tvtx,Tvty,Twt]';
-    
+
 end
 
 function [Tvtx,Tvty] = calcFunc(x,model,goal,zoneParams,obs_on,obs_dr,dR)
@@ -37,7 +36,7 @@ function [Tvtx,Tvty] = calcFunc(x,model,goal,zoneParams,obs_on,obs_dr,dR)
         end
     else
         V_t = model(1);
-        theta_t = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
+        theta_t = angleConversion(rad2deg(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
         vtx = V_t*cos(toRadian(theta_t));
         vty = V_t*sin(toRadian(theta_t));
         vt_mat = [vt_mat;vtx vty];   
@@ -59,10 +58,10 @@ end
 
 function [vt] = vtVector(x,model,goal,obs,dis,zoneParams,dR)
 
-    theta_t = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
-    theta_o = angleConversion(toDegree(atan2(obs(1,2)-x(2),obs(1,1)-x(1)))-180);
+    theta_t = angleConversion(rad2deg(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
+    theta_o = angleConversion(rad2deg(atan2(obs(1,2)-x(2),obs(1,1)-x(1)))-180);
 
-    yaw = angleConversion(toDegree(x(3)));
+    yaw = angleConversion(rad2deg(x(3)));
 
     if dis < dR
         alpha = 0;
@@ -93,15 +92,20 @@ function [vt] = vtVector(x,model,goal,obs,dis,zoneParams,dR)
         gamma = 0;
     end
 
-%     V_t = 0.5*alpha*model(1);
-%     V_o = 0.5*beta*model(1);
-%     V_g = 0.5*gamma*model(1);
+%     Vm = model(1)*dis/zoneParams(3);
+    Vm = model(1);
+    
+    V_t = alpha*Vm;
+    V_o = beta*Vm;
+    V_g = gamma*Vm;
 
-    V_t = alpha*model(1);
-    V_o = beta*model(1);
-    V_g = gamma*model(1);
-
+    %Fixed counterclockwise
     theta_g = angleConversion(theta_o + 90);
+    
+%     Flexible direction
+%     if abs(angleConversion(theta_t-theta_g)) > 90
+%         theta_g = angleConversion(theta_o-90);
+%     end
 
     delta_t = angleConversion(theta_t - yaw);
     delta_o = angleConversion(theta_o - yaw);
@@ -111,6 +115,7 @@ function [vt] = vtVector(x,model,goal,obs,dis,zoneParams,dR)
     vty = V_t*sin(deg2rad(delta_t))+V_o*sin(deg2rad(delta_o))+V_g*sin(deg2rad(delta_g));
 
     vt = [vtx vty];
+
 end
 
 

@@ -1,47 +1,49 @@
-function [evalDB,trajDB] = Evaluation(x,Vt,model,goal,Vr,Ovir,drones,zoneParams,T) 
+function [evalDB] = Evaluation(x,Vt,model,Vr,obs_all,drones,zoneParams) 
     evalDB=[];
     trajDB=[];
-    for vtx=Vr(1):model(5):Vr(1)
-        for vty=Vr(3):model(5):Vr(3)
-            for wt=Vr(5):model(6):Vr(5)
-                u = [vtx vty wt]';
-                [x,traj] = generateTrajectory(x,model,u,T);
-%                 heading=CalcHeadingEval(u,Vt);
-                dist=CalcDistEval(x,drones,zoneParams(1));
-                vel=sqrt(u(1)^2+u(2)^2);
-                stopDist=CalcBreakingDist(vel,model);
-%                 stopDist = 0;
-                if dist>stopDist % 
-%                     evalDB=[evalDB;[vtx vty wt heading dist vel]];
-                    evalDB=[evalDB;[vtx vty wt vel]];
-                    trajDB=[trajDB;traj];
-                end
+
+    for vtx=Vr(1):model(5):Vr(2)
+        for vty=Vr(3):model(6):Vr(4)
+            wt = CalcAngular(x,vtx,vty);
+            if wt < Vr(5) || wt > Vr(6) || wt*Vt(3) <0
+                continue;
+            end
+            u = [vtx vty wt]';
+            heading=CalcHeadingEval(wt,Vt(3));
+            dist=CalcDistEval(x,drones,zoneParams(1));
+            vel= 1- 0.5*sqrt((u(1)-Vt(1))^2+((u(2)-Vt(2))^2));
+            if abs(u(1)*u(2)*Vt(1)*Vt(2)-0) >= 0.01 
+                vel = vel - 0.5*abs((u(2)/Vt(2) - u(1)/Vt(1)));
+            else
+                vel = vel - 0.5*sqrt((u(1)-Vt(1))^2+((u(2)-Vt(2))^2));
+            end
+            stopDist=CalcBreakingDist(u(1),model);
+            if dist>stopDist
+                evalDB=[evalDB;[vtx vty wt heading vel]];
             end
         end
     end
     
 end
 
-function heading=CalcHeadingEval(u,Vt)
+function heading=CalcHeadingEval(wt,Twt)
+    Ttheta = rad2deg(wt);
+    theta = rad2deg(Twt);
 
-    theta = rad2deg(atan2(u(2),u(1)));
-    Tvtx2Tvty=rad2deg(atan2(Vt(2),Vt(1)));
-    
-    if Tvtx2Tvty>theta
-        targetTheta=Tvtx2Tvty-theta;% [deg]
+    if Ttheta>theta
+        targetTheta=Ttheta-theta;% [deg]
     else
-        targetTheta=theta-Tvtx2Tvty;% [deg]
+        targetTheta=theta-Ttheta;% [deg]
     end
 
     heading=180-targetTheta;
 end
 
-function dist=CalcDistEval(x,ob,R)
-    % ?????????
+function dist=CalcDistEval(x,obs,colliR)
     dist=100;
-    if ~isempty(ob)
-        for io=1:length(ob(:,1))
-            disttmp=norm(ob(io,:)-x(1:2)')-R;
+    if ~isempty(obs)
+        for io=1:length(obs(:,1))
+            disttmp=norm(obs(io,:)-x(1:2)')-colliR;
             if dist>disttmp% 
                 dist=disttmp;
             end

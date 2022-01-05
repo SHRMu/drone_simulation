@@ -21,46 +21,25 @@ function VelocityVectorApproach_multi_2
 %             ];
         
     %%%%%%%%%%%%%%%%%%%%%%%%%%% case 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     quad_init_x=[0;10;];
-%     quad_init_y=[10;0;];
-%     goal = [10 0;
-%             0 10;
-%             ];
-
-    %%%%%%%%%%%%%%%%%%%%%%%%%%% case 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    quad_init_x=[0;0;];
-    quad_init_y=[2;10;];
-    goal = [10 10;
-            10 2;
+    quad_init_x=[0;10;];
+    quad_init_y=[10;0;];
+    goal = [10 0;
+            0 10;
             ];
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%% case 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     quad_init_x=[0;0;];
+%     quad_init_y=[2;10;];
+%     goal = [10 10;
+%             10 2;
+%             ];
         
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
     
 %     load("demo1.mat");
     run("parameters.m");
-
-    obstacles = [
-%                1 2;
-%                1.5 2;
-%                2 2;
-%                2.5 2;
-%                3 2;
-%                6 5.5;
-%                6 5;
-%                6 4.5;
-%                6 4;
-%                6.5 4;
-%                7 4;
-%                7.5 4;
-%                8 4;
-               ];
            
-    if ~isempty(obstacles)
-        obs = linkObstacles(obstacles,0.5);
-    else
-        obs = [];
-    end
+    obs = [];
 
     area=[-1 scale -1 scale];% simulation area [xmin xmax ymin ymax]
 
@@ -118,12 +97,15 @@ function VelocityVectorApproach_multi_2
         % drones 
         for di = 1:num
             quiver(x(1,di),x(2,di),ArrowLength*cos(x(3,di)),ArrowLength*sin(x(3,di)),'ok');hold on;
-            plot(results(di).quad(:,1),results(di).quad(:,2),'-b');hold on;
-            plot(goal(di,1),goal(di,2),'*b');hold on;
+            plot(results(di).quad(:,1),results(di).quad(:,2),'-');hold on;
+            plot(goal(di,1),goal(di,2),'*');hold on;
         end
 
         axis(area);
+        xlabel('X(m)');
+        ylabel('Y(m)');
         grid on;
+        
         drawnow;
         
 %         frame = getframe;              
@@ -140,7 +122,8 @@ function VelocityVectorApproach_multi_2
     end
 %     y = results(1).dis2t';
     plot(tx,ty);
-    xlabel('t = 0 interval 0.05s');
+    xlabel('Time(s)');
+    ylabel('Distance to Target(m)')
     
     figure('Name','Nearest Neighbour Distance');
     [N,~] = size(results(1).dis2d);
@@ -150,7 +133,8 @@ function VelocityVectorApproach_multi_2
     end
 %     y = results(1).dis2t';
     plot(dx,dy);
-    xlabel('t = 0 interval 0.05s');
+    xlabel('Time(s)');
+    ylabel('Nearest Neighbour Distance(m)')
     
 end
 

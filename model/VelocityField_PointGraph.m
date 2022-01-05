@@ -63,6 +63,8 @@ function VelocityField_PointGraph
     figure
     quiver(X,Y,u,v);
     hold on;
+    xlabel('X(m)');
+    ylabel('Y(m)');
     plot(obs(1,1), obs(1,2),'d');
     plot(goal(1,1), goal(1,2),'*');
 end

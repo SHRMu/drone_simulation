@@ -10,10 +10,10 @@ function ut = breakdown(model,vtx,vty,wt)
     else
         Vty = vty - vty/abs(vty)*model(2)*dt;
     end
-%     if abs(wt) < model(4)*dt
-%         Wt = 0;
-%     else
-%         Wt = wt - wt/abs(wt)*model(4)*dt;
-%     end
-    ut=[Vtx;Vty;0];
+    if abs(wt) < model(4)*dt
+        Wt = 0;
+    else
+        Wt = wt - wt/abs(wt)*model(4)*dt;
+    end
+    ut=[Vtx;Vty;Wt];
 end

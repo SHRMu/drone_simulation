@@ -18,7 +18,8 @@ function [ut,obs,ob] = PotentialFieldApproach(x,model,goal,zoneParams,obs,drones
     Vt = CalcPotentialVelocity(x,model,goal,zoneParams,obs_on,obs_dr,dR); % Vt is ideal field velocity
     
     obs_all = [obs_on;obs_dr];
-    Vr = CalcDynamicWindow(x,Vt,model);
+    Vr = [Vt(1) Vt(1) Vt(2) Vt(2) Vt(3) Vt(3)];
+%     Vr = CalcDynamicWindow(x,Vt,model);
     if isempty(obs_all) || isempty(obs_dr)
         ut=[Vr(1) Vr(3) Vr(5)]';
     else
@@ -45,8 +46,8 @@ end
 function Vt = CalcPotentialVelocity(x,model,goal,zoneParams,obs_on,obs_dr,dR)
     % no obs within sensor zone
     if isempty(obs_on) && isempty(obs_dr)
-        theta_t = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1)))); % theta2target
-        yaw = angleConversion(toDegree(x(3)));
+        theta_t = angleConversion(rad2deg(atan2(goal(1,2)-x(2),goal(1,1)-x(1)))); % theta2target
+        yaw = angleConversion(rad2deg(x(3)));
         delta_t = angleConversion(theta_t - yaw);
         Tvtx = model(1)*cos(deg2rad(delta_t));
         Tvty = model(1)*sin(deg2rad(delta_t));
@@ -78,7 +79,7 @@ function [Tvtx,Tvty] = calcFunc(x,model,goal,zoneParams,obs_on,obs_dr,dR)
         end
     else
         V_t = model(1);
-        theta_t = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
+        theta_t = angleConversion(rad2deg(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
         vtx = V_t*cos(toRadian(theta_t));
         vty = V_t*sin(toRadian(theta_t));
         vt_mat = [vt_mat;vtx vty]; 
@@ -100,10 +101,10 @@ end
 
 function [vt] = vtVector(x,model,goal,obs,dis,zoneParams,dR)
 
-    theta_t = angleConversion(toDegree(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
-    theta_o = angleConversion(toDegree(atan2(obs(1,2)-x(2),obs(1,1)-x(1)))-180);
+    theta_t = angleConversion(rad2deg(atan2(goal(1,2)-x(2),goal(1,1)-x(1))));
+    theta_o = angleConversion(rad2deg(atan2(obs(1,2)-x(2),obs(1,1)-x(1)))-180);
 
-    yaw = angleConversion(toDegree(x(3)));
+    yaw = angleConversion(rad2deg(x(3)));
 
     if dis < dR
         alpha = 0;

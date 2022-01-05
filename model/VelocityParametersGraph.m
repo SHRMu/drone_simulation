@@ -3,7 +3,7 @@ function VelocityParametersGraph
     dangerR=0.5; % danger zone R
     w=2; % sensor zone wR
     step = 0.01;
-    space = 2.5;
+    space = 2;
     % x=0:0.01:10;
     % y=x.*(x>=0&x<4)+2*(x>=4&x<6)+(5-x/2).*(x>=6&x<8)+1*(x>=8);
     dis=droneR:step:space;
@@ -22,6 +22,8 @@ function VelocityParametersGraph
     plot(dis,gamma,'g','linewidth',1.5);
     hold on;
     legend('Vt','Vo','Vg');
-    xlabel(' 0 < di < 2.5m')
+    xlabel('distance between drone and obstacle (m)');
+    ylabel('velocity magnitude of each velocity component');
+    axis([droneR space 0 1]);
     grid on
 end
